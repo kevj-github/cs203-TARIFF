@@ -1,4 +1,4 @@
-package com.tariff.tariff_server;
+package com.tariff;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
