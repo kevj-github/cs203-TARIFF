@@ -65,7 +65,7 @@ git checkout -b feature/my-task-name
 git add .
 git commit -m "Implement tariff calculation endpoint"
 git push origin feature/my-task-name
-
+```
 
 # Open PR on GitHub and request review
 
