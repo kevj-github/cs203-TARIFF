@@ -12,7 +12,6 @@ public class TariffRule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // matches origin_iso2 / dest_iso2
     @Column(name = "origin_iso2", nullable = false, length = 2)
     private String originCountry;
 
@@ -22,17 +21,20 @@ public class TariffRule {
     @Column(name = "hs_code", nullable = false, length = 10)
     private String hsCode;
 
-    // 'ad_valorem' | 'specific' | 'compound' (we currently use first two)
+    // Enum mapped to 'ad_valorem' | 'specific' | 'compound'
+    @Convert(converter = RuleTypeConverter.class)
     @Column(name = "rule_type", nullable = false, length = 20)
-    private String type;
+    private RuleType type;
 
     // NUMERIC(12,6)
     @Column(name = "rate_value", nullable = false, precision = 12, scale = 6)
     private BigDecimal rate;
 
-    // NOT NULL in schema; allow values like 'PERCENT', 'L', 'LAA', 'USD_PER_LITER'
+    // Enum mapped to 'PERCENT', 'USD_PER_UNIT', 'SGD_PER_UNIT',
+    // 'PERCENT+USD_PER_UNIT', 'PERCENT+SGD_PER_UNIT'
+    @Convert(converter = RateUnitConverter.class)
     @Column(name = "rate_unit", nullable = false, length = 50)
-    private String unit;
+    private RateUnit unit;
 
     @Column(name = "valid_from", nullable = false)
     private LocalDate validFrom;
@@ -43,7 +45,6 @@ public class TariffRule {
     public TariffRule() {}
 
     // getters/setters
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -56,14 +57,14 @@ public class TariffRule {
     public String getHsCode() { return hsCode; }
     public void setHsCode(String hsCode) { this.hsCode = hsCode; }
 
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
+    public RuleType getType() { return type; }
+    public void setType(RuleType type) { this.type = type; }
 
     public BigDecimal getRate() { return rate; }
     public void setRate(BigDecimal rate) { this.rate = rate; }
 
-    public String getUnit() { return unit; }
-    public void setUnit(String unit) { this.unit = unit; }
+    public RateUnit getUnit() { return unit; }
+    public void setUnit(RateUnit unit) { this.unit = unit; }
 
     public LocalDate getValidFrom() { return validFrom; }
     public void setValidFrom(LocalDate validFrom) { this.validFrom = validFrom; }
@@ -71,4 +72,3 @@ public class TariffRule {
     public LocalDate getValidTo() { return validTo; }
     public void setValidTo(LocalDate validTo) { this.validTo = validTo; }
 }
-

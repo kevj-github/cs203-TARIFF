@@ -18,7 +18,7 @@ public class CalcController {
     }
 
     @Operation(summary = "Calculate tariff duty (ad valorem / specific)")
-    @PostMapping
+    @PostMapping(consumes = "application/json", produces = "application/json")
     public CalculationResponse calculate(@Valid @RequestBody CalculationRequest req) {
         return calculationService.calculate(req);
     }

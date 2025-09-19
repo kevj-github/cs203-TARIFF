@@ -2,6 +2,8 @@ package com.tariff.service;
 
 import com.tariff.api.dto.TariffRuleDtos.CreateTariffRuleRequest;
 import com.tariff.api.dto.TariffRuleDtos.TariffRuleResponse;
+import com.tariff.domain.RateUnit;
+import com.tariff.domain.RuleType;
 import com.tariff.domain.TariffRule;
 import com.tariff.repo.TariffRuleRepository;
 import org.springframework.stereotype.Service;
@@ -21,24 +23,15 @@ public class TariffRuleService {
 
     @Transactional
     public TariffRuleResponse create(CreateTariffRuleRequest req) {
-        // Basic normalization
         final String origin = req.origin == null ? null : req.origin.trim().toUpperCase();
         final String dest   = req.dest   == null ? null : req.dest.trim().toUpperCase();
-        final String type   = req.type   == null ? null : req.type.trim();
-        final String unit   = normalizeUnit(type, req.unit);
 
-        // Validate type ↔ unit compatibility
-        if ("ad_valorem".equals(type)) {
-            if (!"PERCENT".equals(unit)) {
-                throw new IllegalArgumentException("ad_valorem rules must use unit = PERCENT.");
-            }
-        } else if ("specific".equals(type)) {
-            if (!"L".equals(unit) && !"LAA".equals(unit)) {
-                throw new IllegalArgumentException("specific rules must use unit = L or LAA.");
-            }
-        } else {
-            throw new IllegalArgumentException("Unsupported rule type: " + type);
-        }
+        // Parse enums from DTO strings (validations already run at DTO layer)
+        final RuleType type = parseRuleType(req.type);
+        final RateUnit unit = parseRateUnit(req.unit);
+
+        // Cross-field validation: enforce type ↔ unit compatibility
+        ensureTypeUnitCompatible(type, unit);
 
         TariffRule t = new TariffRule();
         t.setOriginCountry(origin);
@@ -46,9 +39,10 @@ public class TariffRuleService {
         t.setHsCode(req.hs);
         t.setType(type);
         t.setRate(req.rate);
-        t.setUnit(unit); // NOT NULL by schema
+        t.setUnit(unit);
         t.setValidFrom(req.validFrom);
         t.setValidTo(req.validTo);
+
         TariffRule saved = repo.save(t);
         return toResp(saved);
     }
@@ -69,52 +63,60 @@ public class TariffRuleService {
         r.origin = t.getOriginCountry();
         r.dest = t.getDestCountry();
         r.hs = t.getHsCode();
-        r.type = t.getType();
+        r.type = t.getType().getDbValue();   // "ad_valorem" | "specific" | "compound"
         r.rate = t.getRate();
-        r.unit = t.getUnit();
+        r.unit = t.getUnit().getDbValue();   // e.g. "PERCENT", "USD_PER_UNIT", "PERCENT+USD_PER_UNIT"
         r.validFrom = t.getValidFrom();
         r.validTo = t.getValidTo();
         return r;
     }
 
-    /**
-     * Normalize external/unit inputs into the minimal internal set:
-     *  - ad_valorem → PERCENT (default if missing)
-     *  - specific  → L or LAA
-     * Also maps things like USD_PER_LITER → L, *_PER_LAA → LAA.
-     */
-    private static String normalizeUnit(String type, String rawUnit) {
-        String u = rawUnit == null ? "" : rawUnit.trim().toUpperCase();
+    // ---------- helpers ----------
 
-        if ("ad_valorem".equals(type)) {
-            // Default to PERCENT if caller omitted unit
-            if (u.isEmpty()) return "PERCENT";
-            if ("PERCENT".equals(u) || "%".equals(u)) return "PERCENT";
-            // tolerate "ADVALOREM" / "AD_VALOREM_PERCENT" style inputs
-            if (u.endsWith("PERCENT")) return "PERCENT";
-            return "PERCENT"; // safest default for ad valorem
-        }
+    private static RuleType parseRuleType(String s) {
+        if (s == null) throw new IllegalArgumentException("rule type is required");
+        String v = s.trim().toLowerCase();
+        return switch (v) {
+            case "ad_valorem" -> RuleType.AD_VALOREM;
+            case "specific"   -> RuleType.SPECIFIC;
+            case "compound"   -> RuleType.COMPOUND;
+            default -> throw new IllegalArgumentException("Unsupported rule type: " + s);
+        };
+    }
 
-        if ("specific".equals(type)) {
-            if (u.isEmpty()) {
-                // missing unit for specific is not OK — be explicit
-                throw new IllegalArgumentException("Unit is required for specific rules (use L or LAA).");
+    private static RateUnit parseRateUnit(String s) {
+        if (s == null) throw new IllegalArgumentException("unit is required");
+        String v = s.trim().toUpperCase();
+        // Allow a few tolerant aliases
+        if ("%".equals(v)) v = "PERCENT";
+        return switch (v) {
+            case "PERCENT" -> RateUnit.PERCENT;
+            case "USD_PER_UNIT" -> RateUnit.USD_PER_UNIT;
+            case "SGD_PER_UNIT" -> RateUnit.SGD_PER_UNIT;
+            case "PERCENT+USD_PER_UNIT" -> RateUnit.PERCENT_PLUS_USD_PER_UNIT;
+            case "PERCENT+SGD_PER_UNIT" -> RateUnit.PERCENT_PLUS_SGD_PER_UNIT;
+            default -> throw new IllegalArgumentException("Unsupported unit: " + s);
+        };
+    }
+
+    private static void ensureTypeUnitCompatible(RuleType type, RateUnit unit) {
+        switch (type) {
+            case AD_VALOREM -> {
+                if (unit != RateUnit.PERCENT) {
+                    throw new IllegalArgumentException("ad_valorem rules must use unit = PERCENT");
+                }
             }
-            // Accept L / LAA directly
-            if ("L".equals(u) || "LAA".equals(u)) return u;
-
-            // Map *_PER_LITER → L, *_PER_LAA → LAA
-            if (u.endsWith("_PER_LITER")) return "L";
-            if (u.endsWith("_PER_LAA"))   return "LAA";
-
-            // Accept common alternates
-            if ("PER_LITER".equals(u) || "LITER".equals(u) || "LITRE".equals(u)) return "L";
-            if ("PER_LAA".equals(u)) return "LAA";
-
-            throw new IllegalArgumentException("Unsupported unit for specific rule: " + rawUnit);
+            case SPECIFIC -> {
+                if (!(unit == RateUnit.USD_PER_UNIT || unit == RateUnit.SGD_PER_UNIT)) {
+                    throw new IllegalArgumentException("specific rules must use unit = USD_PER_UNIT or SGD_PER_UNIT");
+                }
+            }
+            case COMPOUND -> {
+                if (!(unit == RateUnit.PERCENT_PLUS_USD_PER_UNIT || unit == RateUnit.PERCENT_PLUS_SGD_PER_UNIT)) {
+                    throw new IllegalArgumentException("compound rules must use unit = PERCENT+USD_PER_UNIT or PERCENT+SGD_PER_UNIT");
+                }
+            }
         }
-
-        // Unknown type; return as-is (create() will reject)
-        return u;
     }
 }
+
