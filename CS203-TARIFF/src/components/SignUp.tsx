@@ -4,7 +4,7 @@ import { LoginForm } from "@/components/login-form";
 
 import tariffImg from "../assets/tariff.png";
 
-export default function LoginPage() {
+export default function SignupPage() {
   return (
     <div className="grid min-h-screen w-screen lg:grid-cols-[1fr_2fr]">
       <div className="flex flex-col gap-4 p-6 md:p-10">
