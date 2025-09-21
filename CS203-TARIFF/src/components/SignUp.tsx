@@ -3,6 +3,7 @@ import { GalleryVerticalEnd, LucideCroissant } from "lucide-react";
 import { LoginForm } from "@/components/login-form";
 
 import tariffImg from "../assets/tariff.png";
+import { SignupForm } from "./signup-form";
 
 export default function SignupPage() {
   return (
@@ -18,7 +19,7 @@ export default function SignupPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginForm />
+            <SignupForm />
           </div>
         </div>
       </div>

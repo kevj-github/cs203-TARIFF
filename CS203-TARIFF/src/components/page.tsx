@@ -23,7 +23,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="bg-muted relative hidden lg:block">
+      <div className="bg-muted relative hidden lg:block rounded-sm">
         <img
           src={tariffImg}
           alt="Image"
