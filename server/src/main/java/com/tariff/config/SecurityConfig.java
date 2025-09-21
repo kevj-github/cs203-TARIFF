@@ -23,6 +23,11 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -56,21 +61,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()   // allow login/register
-                        .requestMatchers("/h2-console/**").permitAll() // allow H2 console
-                        .anyRequest().authenticated()                  // everything else needs login
-                )
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable())
-                .headers(headers -> headers.frameOptions().disable()); // for H2 console
-
-        // Add JWT filter before UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
+            .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll() // allow ALL requests without login
+            )
+            .formLogin(form -> form.disable()) // turn off login form
+            .httpBasic(basic -> basic.disable()); // turn off basic auth
         return http.build();
     }
 }
