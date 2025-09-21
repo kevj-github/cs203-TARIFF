@@ -2,6 +2,7 @@ package com.tariff.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import jakarta.persistence.Table; 
 
 @Entity
 @Table(name = "tariff_rules")
