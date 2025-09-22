@@ -3,22 +3,28 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import LoginPage from "./components/page";
+import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignUp";
+import AppLayout from "./AppLayout";
+import ProductsPage from "./components/ProductsPage";
+import CalculatorPage from "./components/CalculatorPage";
+import ProfilePage from "./components/ProfilePage";
+// import ProductsPage from "./components/ProductsPage";
+// import { ProductsPage } from "./ProductsPage";
 
 function App() {
-  // return (
-  //   <>
-  //     <div className="min-h-screen flex items-center justify-center bg-background">
-  //       <LoginPage />
-  //     </div>
-  //   </>
-  // );
-
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+      {/* DO NOT DELETE‼️‼️‼️ */}
+      {/* <Route path="/" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} /> */}
+
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<ProductsPage />} />
+        <Route path="/product" element={<ProductsPage />} />
+        <Route path="/calculator" element={<CalculatorPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Route>
     </Routes>
   );
 }
