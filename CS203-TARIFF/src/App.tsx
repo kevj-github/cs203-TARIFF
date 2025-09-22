@@ -1,29 +1,26 @@
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import LoginPage from "./components/page";
+import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignUp";
-import { ProtectedRoute } from "./components/protected-route";
-
-// Placeholder Dashboard component
-const Dashboard = () => (
-  <div className="p-8">
-    <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-    <p>Welcome to your secure dashboard!</p>
-  </div>
-);
+import AppLayout from "./AppLayout";
+import ProductsPage from "./components/ProductsPage";
+import CalculatorPage from "./components/CalculatorPage";
+import ProfilePage from "./components/ProfilePage";
+// import ProductsPage from "./components/ProductsPage";
+// import { ProductsPage } from "./ProductsPage";
 
 function App() {
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      
-      {/* Protected routes */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        {/* Add other protected routes here */}
+      {/* DO NOT DELETE‼️‼️‼️ */}
+      {/* <Route path="/" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} /> */}
+
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<ProductsPage />} />
+        <Route path="/product" element={<ProductsPage />} />
+        <Route path="/calculator" element={<CalculatorPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
     </Routes>
   );
