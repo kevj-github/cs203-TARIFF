@@ -10,8 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "com.tariff.domain")
 public class TariffServerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TariffServerApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(TariffServerApplication.class, args);
+    }
 }
