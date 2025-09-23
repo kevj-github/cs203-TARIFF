@@ -59,7 +59,7 @@ configurations.all {
         force "org.flywaydb:flyway-database-postgresql:11.7.2"
     }
 }
-}
+
 
 
 tasks.named('test') {
