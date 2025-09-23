@@ -62,6 +62,12 @@ configurations.all {
 
 
 
+tasks.named('bootRun') {
+    systemProperties = [
+        'spring.profiles.active': 'dev'
+    ]
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
