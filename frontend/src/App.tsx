@@ -7,6 +7,7 @@ import AppLayout from "./AppLayout";
 import ProductsPage from "./components/ProductsPage";
 import CalculatorPage from "./components/CalculatorPage";
 import ProfilePage from "./components/ProfilePage";
+import "react-day-picker/style.css";
 
 function App() {
   return (

@@ -59,16 +59,21 @@ const powerSupport = [
 ];
 
 const FormSchema = z.object({
-  origin: z.string().min(1, "Please select origin."),
-  destination: z.string().min(1, "Please select destination."),
-  hsCode: z.string().min(4, "HS code must be at least 4 digits."),
+  origin: z.string().min(1, "Please select origin country."),
+  destination: z.string().min(1, "Please select destination country."),
+  productCategory: z.string().min(1, "Please select a product category."),
   value: z.string().min(1, "Product value is required."),
 });
 
 export default function CalculatorPage() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { origin: "", destination: "", hsCode: "", value: "" },
+    defaultValues: {
+      origin: "",
+      destination: "",
+      productCategory: "",
+      value: "",
+    },
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -76,97 +81,8 @@ export default function CalculatorPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-3">
       <h1 className="text-2xl font-bold mb-4">Tariff Calculator</h1>
-      {/* <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid gap-6 md:grid-cols-2"
-        >
-          <Select>
-            <SelectTrigger className="w-[inherit]">
-              <SelectValue placeholder="Source" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectGroup>
-                <SelectLabel>Countries</SelectLabel>
-                {countries.map((country) => (
-                  <SelectItem key={country.value} value={country.value}>
-                    {country.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Select>
-            <SelectTrigger className="w-[inherit]">
-              <SelectValue placeholder="Destination" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectGroup>
-                <SelectLabel>Fruits</SelectLabel>
-                {countries.map((country) => (
-                  <SelectItem key={country.value} value={country.value}>
-                    {country.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Select>
-            <SelectTrigger className="w-[inherit]">
-              <SelectValue placeholder="HS Code" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectGroup>
-                <SelectLabel className="font-bold">PC Components</SelectLabel>
-                {pcComponents.map((pcComponent) => (
-                  <SelectItem key={pcComponent.code} value={pcComponent.code}>
-                    {pcComponent.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-
-              <SelectGroup>
-                <SelectLabel className="font-bold">
-                  Consumer Electronics
-                </SelectLabel>
-                {consumerElectronics.map((consumerElectronics) => (
-                  <SelectItem
-                    key={consumerElectronics.code}
-                    value={consumerElectronics.code}
-                  >
-                    {consumerElectronics.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-
-              <SelectGroup>
-                <SelectLabel className="font-bold">Power & Support</SelectLabel>
-                {powerSupport.map((powerSupport) => (
-                  <SelectItem key={powerSupport.code} value={powerSupport.code}>
-                    {powerSupport.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Input
-            type="number"
-            placeholder="Product value"
-            title="Product value"
-          />
-
-          
-
-          <div className="col-span-full flex justify-end">
-            <Button type="submit">Calculate</Button>
-          </div>
-        </form>
-      </Form> */}
 
       <Form {...form}>
         <form
@@ -179,10 +95,10 @@ export default function CalculatorPage() {
             name="origin"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Origin</FormLabel>
+                <FormLabel>Origin Country</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger className="w-[inherit]">
-                    <SelectValue placeholder="Select origin" />
+                    <SelectValue placeholder="Select origin country" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     <SelectGroup>
@@ -210,10 +126,10 @@ export default function CalculatorPage() {
             name="destination"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Destination</FormLabel>
+                <FormLabel>Destination Country</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger className="w-[inherit]">
-                    <SelectValue placeholder="Select destination" />
+                    <SelectValue placeholder="Select destination country" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     <SelectGroup>
@@ -235,13 +151,15 @@ export default function CalculatorPage() {
             )}
           />
 
-          {/* HS Code */}
+          <Calendar23 />
+
+          {/* Product Category */}
           <FormField
             control={form.control}
-            name="hsCode"
+            name="productCategory"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>HS Code</FormLabel>
+                <FormLabel>Product Category</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger className="w-[inherit]">
                     <SelectValue placeholder="Select product" />
@@ -251,7 +169,7 @@ export default function CalculatorPage() {
                       <SelectLabel>PC Components</SelectLabel>
                       {pcComponents.map((item) => (
                         <SelectItem
-                          className="font-bold"
+                          className="font-bold cursor-pointer hover:bg-indigo-100"
                           key={item.code}
                           value={item.code}
                         >
@@ -264,7 +182,7 @@ export default function CalculatorPage() {
                       <SelectLabel>Consumer Electronics</SelectLabel>
                       {consumerElectronics.map((item) => (
                         <SelectItem
-                          className="font-bold"
+                          className="font-bold cursor-pointer hover:bg-indigo-100"
                           key={item.code}
                           value={item.code}
                         >
@@ -277,7 +195,7 @@ export default function CalculatorPage() {
                       <SelectLabel>Power & Support</SelectLabel>
                       {powerSupport.map((item) => (
                         <SelectItem
-                          className="font-bold"
+                          className="font-bold cursor-pointer hover:bg-indigo-100"
                           key={item.code}
                           value={item.code}
                         >
@@ -298,9 +216,14 @@ export default function CalculatorPage() {
             name="value"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Product Value (USD)</FormLabel>
+                <FormLabel>Product Value</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="1000" {...field} />
+                  <Input
+                    className="focus-visible:border-ring focus-visible:ring-ring/50"
+                    type="number"
+                    placeholder="1000"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -308,7 +231,6 @@ export default function CalculatorPage() {
           />
 
           {/* <CalendarForm /> */}
-          <Calendar23 />
           {/* Submit */}
           <div className="col-span-full flex justify-end">
             <Button type="submit">Calculate</Button>

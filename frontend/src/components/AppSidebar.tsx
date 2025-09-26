@@ -8,7 +8,7 @@ import {
   Settings,
   User2,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import {
   Sidebar,
@@ -62,21 +62,28 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link
+                    <NavLink
                       key={item.title}
                       to={item.url}
-                      className={`flex items-center gap-2 p-2 rounded transition-colors
-              ${
-                onmouseenter
-                  ? "bg-red-500  text-black"
-                  : "text-black hover:bg-red-500 hover:text-white"
-              }
-            `}
-                      //   className="flex items-center gap-2 p-2 hover:bg-accent rounded"
+                      //           className={`flex items-center gap-2 p-2 rounded transition-colors
+                      //   ${
+                      //     onmouseenter
+                      //       ? "bg-red-500  text-black"
+                      //       : "text-black hover:bg-red-500 hover:text-white"
+                      //   }
+                      // `}
+
+                      className={({ isActive }) =>
+                        `flex items-center gap-2 p-2 rounded transition-colors ${
+                          isActive
+                            ? "bg-red-500 text-white" // active route
+                            : "text-black hover:bg-red-500 hover:text-white"
+                        }`
+                      }
                     >
                       <item.icon />
                       {item.title}
-                    </Link>
+                    </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
