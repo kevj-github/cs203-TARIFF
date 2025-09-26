@@ -60,7 +60,7 @@ export function LoginForm({
 				
 				console.log("Logged in:", data);
 				// Redirect to home page or dashboard
-				navigate("/dashboard");
+				navigate("/profile");
 			}
 		} catch (err) {
 			console.error("Login error:", err);
