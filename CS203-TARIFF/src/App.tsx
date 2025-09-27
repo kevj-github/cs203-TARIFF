@@ -6,6 +6,8 @@ import AppLayout from "./AppLayout";
 import ProductsPage from "./components/ProductsPage";
 import CalculatorPage from "./components/CalculatorPage";
 import ProfilePage from "./components/ProfilePage";
+import { ProtectedRoute } from "./components/protected-route";
+import TariffDashboard from "./components/TariffDashboard";
 
 function App() {
   return (
@@ -14,10 +16,13 @@ function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/" element={<Navigate to="/login" />} />
 
-      <Route element={<AppLayout />}>
-        <Route path="/product" element={<ProductsPage />} />
-        <Route path="/calculator" element={<CalculatorPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route path="/home" element={<TariffDashboard />} />
+          <Route path="/product" element={<ProductsPage />} />
+          <Route path="/calculator" element={<CalculatorPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
       </Route>
     </Routes>
   );
