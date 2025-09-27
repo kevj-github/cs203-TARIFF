@@ -1,73 +1,51 @@
 import { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
-interface Product {
+interface UserProfile {
   id: number;
-  name: string;
-  category: string;
-  price: number;
+  username: string;
+  email: string;
 }
 
 export default function ProfilePage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchProfile() {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
-        const data = await res.json();
-        setProducts(data);
+        const token = localStorage.getItem("token"); // 👈 store your JWT after login
+        const res = await fetch("http://localhost:8080/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else {
+          setUser(null);
+        }
       } catch (err) {
-        console.error("Error fetching products:", err);
+        console.error("Error fetching profile:", err);
       } finally {
         setLoading(false);
       }
     }
-    fetchProducts();
+    fetchProfile();
   }, []);
 
-  if (loading) return <p className="p-6">Loading products...</p>;
+  if (loading) return <p className="p-6">Loading profile...</p>;
+  if (!user) return <p className="p-6">You are not logged in.</p>;
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Products</h1>
-      <Table>
-        <TableCaption>A list of available products</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead className="text-right">Price</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {products.map((p) => (
-            <TableRow key={p.id}>
-              <TableCell className="font-medium">{p.id}</TableCell>
-              <TableCell>{p.name}</TableCell>
-              <TableCell>{p.category}</TableCell>
-              <TableCell className="text-right">${p.price}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableCell colSpan={3}>Total Products</TableCell>
-            <TableCell className="text-right">{products.length}</TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
+      <h1 className="text-2xl font-semibold mb-4">Profile</h1>
+      <div className="space-y-2">
+        <p><strong>ID:</strong> {user.id}</p>
+        <p><strong>Username:</strong> {user.username}</p>
+        <p><strong>Email:</strong> {user.email}</p>
+      </div>
     </div>
   );
 }
