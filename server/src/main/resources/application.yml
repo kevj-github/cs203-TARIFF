@@ -4,8 +4,8 @@
 spring:
   application:
     name: tariff-server
-  profiles:
-    active: prod 
+  profiles.active: prod
+
   jpa:
     show-sql: true
     properties:

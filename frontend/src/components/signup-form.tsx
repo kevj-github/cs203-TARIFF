@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { setToken, setUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,7 +53,7 @@ export function SignupForm({
   //     localStorage.setItem("token", data.token);
 
   //     // Redirect to profile/home
-  //     navigate("/profile");
+  //				navigate("/home");
   //   } catch (err) {
   //     console.error("Signup error:", err);
   //     if (err instanceof Error) {
