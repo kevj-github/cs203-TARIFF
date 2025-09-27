@@ -1,0 +1,42 @@
+/* Calendar root */
+.rdp {
+  --rdp-accent-color: #535bf2; /* primary highlight */
+  --rdp-background-color: #f8f9fa;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Days */
+.rdp-day {
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.rdp-day:hover {
+  background-color: rgba(83, 91, 242, 0.1);
+  color: #535bf2;
+}
+
+/* Selected range */
+.rdp-day_selected,
+.rdp-day_selected:hover {
+  background-color: #535bf2;
+  color: white;
+}
+
+/* Range middle (between from and to) */
+.rdp-day_range_middle {
+  background-color: rgba(83, 91, 242, 0.15);
+  color: black;
+}
+
+/* Today */
+.rdp-day_today {
+  font-weight: bold;
+  border: 1px solid #535bf2;
+}

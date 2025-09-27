@@ -37,6 +37,7 @@ export function LoginForm({
 		e.preventDefault();
 		setError("");
 
+
 		try {
 			const res = await fetch("http://localhost:8080/api/auth/login", {
 				method: "POST",
@@ -48,6 +49,7 @@ export function LoginForm({
 			});
 
 			const data: LoginResponse = await res.json();
+
 
 			if (!res.ok) {
 				throw new Error(data.message || "Login failed");
