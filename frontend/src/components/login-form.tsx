@@ -89,7 +89,7 @@ export function LoginForm({
             required
           />
         </div>
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full bg-primary !bg-[#eddea4]">
           Login
         </Button>
 

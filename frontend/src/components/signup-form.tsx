@@ -22,49 +22,6 @@ export function SignupForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  // const navigate = useNavigate();
-
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   setLoading(true);
-
-  //   if (password !== confirmPassword) {
-  //     setError("Passwords do not match");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     const res = await fetch("http://localhost:5000/api/register", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ email, password }),
-  //     });
-
-  //     const data: SignupResponse = await res.json();
-
-  //     if (!res.ok) throw new Error(data?.["message"] || "Signup failed");
-
-  //     console.log("Signed up:", data);
-
-  //     // Save token (if your backend returns one)
-  //     localStorage.setItem("token", data.token);
-
-  //     // Redirect to profile/home
-  //     navigate("/profile");
-  //   } catch (err) {
-  //     console.error("Signup error:", err);
-  //     if (err instanceof Error) {
-  //       setError(err.message);
-  //     } else {
-  //       setError("Something went wrong");
-  //     }
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   return (
     <form
       className={cn("flex flex-col gap-6", className)}
@@ -116,7 +73,7 @@ export function SignupForm({
           />
         </div>
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full !bg-[#eddea4]">
           Register
         </Button>
 
