@@ -68,7 +68,7 @@ export function SignupForm({
 				
 				console.log("Registered successfully:", data);
 				// Redirect to dashboard
-				navigate("/profile");
+				navigate("/home");
 			}
 		} catch (err) {
 			console.error("Registration error:", err);
