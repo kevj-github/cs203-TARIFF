@@ -1,26 +1,23 @@
+# ------------------------
+# Default/Common Config
+# ------------------------
 spring:
   application:
     name: tariff-server
-  datasource:
-    url: jdbc:postgresql://db.xizwjutjdldhrthleubs.supabase.co:5432/postgres
-    username: postgres
-    password: jY8MbHb4bg_hij!
-    driver-class-name: org.postgresql.Driver
+  profiles:
+    active: prod 
   jpa:
-    hibernate:
-      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
+
 server:
   port: 8080
 
-# Development profile configuration
+# ------------------------
+# Dev Profile (H2 In-memory for local development)
+# ------------------------
 ---
 spring:
   config:
@@ -36,4 +33,50 @@ spring:
     password:
   jpa:
     hibernate:
+      ddl-auto: create-drop  # Clean slate each restart for dev
+  flyway:
+    enabled: false  # Disable for H2 development
+
+# ------------------------
+# Prod Profile (Supabase PostgreSQL via Session Pooler)
+# ------------------------
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+    username: postgres.xizwjutjdldhrthleubs
+    password: jY8MbHb4bg_hij!
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: false  # Disable Flyway for now
+
+# ------------------------
+# Direct Profile (Alternative Supabase connection for IPv6 hosts)
+# ------------------------
+---
+spring:
+  config:
+    activate:
+      on-profile: direct
+  datasource:
+    url: jdbc:postgresql://db.xizwjutjdldhrthleubs.supabase.co:5432/postgres
+    username: postgres
+    password: jY8MbHb4bg_hij!
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: false  # Disable Flyway for now
