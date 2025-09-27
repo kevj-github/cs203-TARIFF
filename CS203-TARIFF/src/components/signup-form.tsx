@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 import { setToken, setUser } from "@/lib/auth";
 
@@ -148,6 +149,7 @@ export function SignupForm({
 				{error && <p className="text-red-500 text-sm">{error}</p>}
 
 				{/* <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+
           <span className="bg-background text-muted-foreground relative z-10 px-2">
             Or continue with
           </span>
@@ -161,6 +163,7 @@ export function SignupForm({
           </svg>
           Login with GitHub
         </Button> */}
+
 			</div>
 			<div className="text-center text-sm">
 				Already have an account?{" "}

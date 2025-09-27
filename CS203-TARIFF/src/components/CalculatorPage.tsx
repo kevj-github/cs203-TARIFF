@@ -23,6 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { CalendarForm } from "./CalendarForm";
+
+
 const countries = [
   { label: "Singapore", value: "SG" },
   { label: "United States", value: "US" },
@@ -304,6 +307,7 @@ export default function CalculatorPage() {
               </FormItem>
             )}
           />
+          <CalendarForm />
 
           {/* Submit */}
           <div className="col-span-full flex justify-end">

@@ -24,8 +24,10 @@ export default function ProfilePage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
+
         const response = await fetch('/products');
         const data = await response.json() as Product[];
+
         setProducts(data);
       } catch (err) {
         console.error("Error fetching products:", err);

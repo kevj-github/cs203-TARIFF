@@ -10,11 +10,13 @@ import ProfilePage from "./components/ProfilePage";
 function App() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/" element={<Navigate to="/login" />} />
+      {/* DO NOT DELETE‼️‼️‼️ */}
+      {/* <Route path="/" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} /> */}
 
       <Route element={<AppLayout />}>
+        <Route path="/" element={<ProductsPage />} />
+
         <Route path="/product" element={<ProductsPage />} />
         <Route path="/calculator" element={<CalculatorPage />} />
         <Route path="/profile" element={<ProfilePage />} />
