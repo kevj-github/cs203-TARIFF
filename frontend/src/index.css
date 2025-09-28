@@ -239,11 +239,12 @@ button:focus-visible {
 
 a {
   font-weight: 500;
-  color: #000000;
+  color: #0fa3b1;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  /* color: #535bf2; */
+  opacity: 80%;
 }
 
 body {
@@ -264,12 +265,14 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid thick;
+
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  /* background-color: #f6f6f6; */
+
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -286,12 +289,17 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+  a {
+    color: #0fa3b1;
+  }
   a:hover {
-    color: #747bff;
+    /* color: #747bff; */
+    opacity: 60%;
   }
-  button {
-    background-color: #f9f9f9;
-  }
+  /* button {
+    background-color: #eddea4;
+  } */
+
 }
 
 /* @layer base {

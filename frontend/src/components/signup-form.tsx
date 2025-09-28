@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 import { setToken, setUser } from "@/lib/auth";
 
@@ -161,13 +162,14 @@ export function SignupForm({
           </svg>
           Login with GitHub
         </Button> */}
-			</div>
-			<div className="text-center text-sm">
-				Already have an account?{" "}
-				<Link to="/" className="underline underline-offset-4">
-					Log in
-				</Link>
-			</div>
-		</form>
-	);
+      </div>
+      <div className="text-center text-sm">
+        Already have an account?{" "}
+        <Link to="/" className="underline underline-offset-4">
+          Log in
+        </Link>
+      </div>
+    </form>
+  );
 }
+
