@@ -1,6 +1,8 @@
 import { GalleryVerticalEnd, LucideCroissant } from "lucide-react";
 
 import { LoginForm } from "@/components/login-form";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+
 
 import tariffImg from "../assets/tariff.png";
 import { SignupForm } from "./signup-form";
@@ -24,13 +26,13 @@ export default function SignupPage() {
         </div>
       </div>
 
-      <div className="bg-muted relative hidden lg:block">
-        <img
-          src={tariffImg}
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
-      </div>
+      <DotLottieReact
+        src="https://lottie.host/7fa0255f-7fe0-43ea-a5f6-3a8619aded05/Q65blTQLbt.lottie"
+        loop
+        autoplay
+        className="hidden lg:flex items-center justify-center w-full h-full mx-auto object-contain"
+      />
+
     </div>
   );
 }

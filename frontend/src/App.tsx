@@ -1,3 +1,8 @@
+import "./App.css";
+// import ProductsPage from "./components/ProductsPage";
+// import CalculatorPage from "./components/CalculatorPage";
+// import ProfilePage from "./components/ProfilePage";
+
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App";
 import LoginPage from "./components/LoginPage";
@@ -6,12 +11,16 @@ import AppLayout from "./AppLayout";
 import ProductsPage from "./components/ProductsPage";
 import CalculatorPage from "./components/CalculatorPage";
 import ProfilePage from "./components/ProfilePage";
+import "react-day-picker/style.css";
+
+
 import { ProtectedRoute } from "./components/protected-route";
 import TariffDashboard from "./components/TariffDashboard";
 
 function App() {
   return (
     <Routes>
+
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/" element={<Navigate to="/login" />} />
@@ -29,3 +38,5 @@ function App() {
 }
 
 export default App;
+
+

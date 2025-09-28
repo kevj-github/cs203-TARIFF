@@ -1,5 +1,11 @@
 "use client";
 
+import { format } from "date-fns";
+import "react-day-picker/style.css";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,8 +28,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarForm } from "./CalendarForm";
-import Calendar23 from "./calendar-23";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useState } from "react";
+import { CalculationResultCard } from "./CalculationResultCard";
+
 
 const countries = [
   { label: "Singapore", value: "SG" },
@@ -32,7 +44,8 @@ const countries = [
   { label: "Japan", value: "JP" },
   { label: "Germany", value: "DE" },
   { label: "Indonesia", value: "ID" },
-] as const;
+];
+
 
 // PC Components
 const pcComponents = [
@@ -60,25 +73,75 @@ const powerSupport = [
 
 const FormSchema = z.object({
   origin: z.string().min(1, "Please select origin country."),
-  destination: z.string().min(1, "Please select destination country."),
-  productCategory: z.string().min(1, "Please select a product category."),
-  value: z.string().min(1, "Product value is required."),
+  dest: z.string().min(1, "Please select destination country."),
+  hs: z.string().min(1, "Please select a product category."),
+  customsValue: z.string().min(1, "Product value is required."),
+  quantity: z.string().min(0, "Quantity is required."),
+  // on: z.date().min(1, "Please select import date."),
+  on: z.string().min(1, "Please select import date."),
 });
 
 export default function CalculatorPage() {
+  const [result, setResult] = useState<any | null>(null); // store backend result
+  const [loading, setLoading] = useState(false);
+
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       origin: "",
-      destination: "",
-      productCategory: "",
-      value: "",
+      dest: "",
+      hs: "",
+      customsValue: "",
+      quantity: "",
+      on: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("Form submitted:", data);
-  }
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      setLoading(true);
+      setResult(null);
+
+      const payload = {
+        origin: data.origin,
+        dest: data.dest,
+        hs: data.hs,
+        on: data.on, // YYYY-MM-DD
+        customsValue: Number(data.customsValue),
+        quantity: Number(data.quantity),
+
+        // customsValue: data.customsValue,
+        // quantity: data.quantity,
+      };
+
+      const response = await fetch("http://localhost:8080/calculate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Backend error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      // console.log("Backend result:", result);
+      setResult(result);
+      // Show results on screen
+      // alert(
+      //   `Base Duty: ${result.baseDuty}\nTotal: ${result.total}\nRule: ${result.ruleApplied}`
+      // );
+    } catch (err) {
+      console.error(err);
+      setResult({ error: "Failed to fetch tariff calculation" });
+      // alert("Failed to fetch tariff calculation");
+    } finally {
+      setLoading(false);
+    }
+
 
   return (
     <div className="p-3">
@@ -97,15 +160,17 @@ export default function CalculatorPage() {
               <FormItem>
                 <FormLabel>Origin Country</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-[inherit]">
+                  <SelectTrigger className="w-[inherit] ">
                     <SelectValue placeholder="Select origin country" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white">
+                  <SelectContent className="bg-white ">
+
                     <SelectGroup>
                       <SelectLabel>Countries</SelectLabel>
                       {countries.map((c) => (
                         <SelectItem
-                          className="font-bold"
+                          className="font-bold cursor-pointer hover:bg-indigo-100"
+
                           key={c.value}
                           value={c.value}
                         >
@@ -115,7 +180,8 @@ export default function CalculatorPage() {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
+
               </FormItem>
             )}
           />
@@ -123,7 +189,8 @@ export default function CalculatorPage() {
           {/* Destination */}
           <FormField
             control={form.control}
-            name="destination"
+            name="dest"
+
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Destination Country</FormLabel>
@@ -131,12 +198,14 @@ export default function CalculatorPage() {
                   <SelectTrigger className="w-[inherit]">
                     <SelectValue placeholder="Select destination country" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white">
+                  <SelectContent className="bg-white ">
+
                     <SelectGroup>
                       <SelectLabel>Countries</SelectLabel>
                       {countries.map((c) => (
                         <SelectItem
-                          className="font-bold"
+                          className="font-bold cursor-pointer hover:bg-indigo-100"
+
                           key={c.value}
                           value={c.value}
                         >
@@ -146,17 +215,17 @@ export default function CalculatorPage() {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
+
               </FormItem>
             )}
           />
 
-          <Calendar23 />
-
           {/* Product Category */}
           <FormField
             control={form.control}
-            name="productCategory"
+            name="hs"
+
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Category</FormLabel>
@@ -205,7 +274,53 @@ export default function CalculatorPage() {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="on"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Import Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[full] pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(new Date(field.value), "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) =>
+                        field.onChange(date ? format(date, "yyyy-MM-dd") : "")
+                      }
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      captionLayout="dropdown"
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <FormMessage className="text-red-500" />
+
               </FormItem>
             )}
           />
@@ -213,10 +328,11 @@ export default function CalculatorPage() {
           {/* Product Value */}
           <FormField
             control={form.control}
-            name="value"
+            name="customsValue"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Product Value</FormLabel>
+                <FormLabel>Product Value (USD)</FormLabel>
+
                 <FormControl>
                   <Input
                     className="focus-visible:border-ring focus-visible:ring-ring/50"
@@ -225,18 +341,52 @@ export default function CalculatorPage() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
 
-          {/* <CalendarForm /> */}
+          {/* Product Quantity */}
+          <FormField
+            control={form.control}
+            name="quantity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Quantity</FormLabel>
+                <FormControl>
+                  <Input
+                    className="focus-visible:border-ring focus-visible:ring-ring/50"
+                    type="number"
+                    placeholder="Minimum quantity of 1"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500" />
+
+              </FormItem>
+            )}
+          />
+
           {/* Submit */}
           <div className="col-span-full flex justify-end">
-            <Button type="submit">Calculate</Button>
+            <Button type="submit" className="!bg-[#eddea4]" disabled={loading}>
+              {loading ? "Calculating..." : "Calculate"}
+            </Button>
           </div>
         </form>
       </Form>
+
+      {/* Display Result */}
+      {result && (
+        <CalculationResultCard
+          baseDuty={result.baseDuty}
+          total={result.total}
+          ruleApplied={result.ruleApplied}
+          error={result.error}
+        />
+      )}
+
+
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
 interface Product {
   id: number;
   name: string;
+
   productType: string;
   hsCode: string;
   brand: string | null;
@@ -26,6 +27,7 @@ export default function ProductsPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
+
         const res = await fetch("http://localhost:8080/api/products");
         const data = await res.json();
         setProducts(data);
@@ -50,6 +52,7 @@ export default function ProductsPage() {
             <TableHead className="w-[100px]">ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Category</TableHead>
+
             <TableHead className="text-right">HS_code</TableHead>
           </TableRow>
         </TableHeader>
@@ -58,6 +61,7 @@ export default function ProductsPage() {
             <TableRow key={p.id}>
               <TableCell className="font-medium">{p.id}</TableCell>
               <TableCell>{p.name}</TableCell>
+
               <TableCell>{p.productType}</TableCell>
               <TableCell className="text-right">{p.hsCode}</TableCell>
             </TableRow>
