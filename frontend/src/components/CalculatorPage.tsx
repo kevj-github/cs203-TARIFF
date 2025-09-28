@@ -43,7 +43,7 @@ const countries = [
   { label: "Japan", value: "JP" },
   { label: "Germany", value: "DE" },
   { label: "Indonesia", value: "ID" },
-] as const;
+];
 
 // PC Components
 const pcComponents = [
@@ -344,7 +344,7 @@ export default function CalculatorPage() {
                   <Input
                     className="focus-visible:border-ring focus-visible:ring-ring/50"
                     type="number"
-                    placeholder="1000"
+                    placeholder="Minimum quantity of 1"
                     {...field}
                   />
                 </FormControl>
