@@ -8,147 +8,147 @@ import { Link, useNavigate } from "react-router-dom";
 import { setToken, setUser } from "@/lib/auth";
 
 interface ApiResponse<T> {
-	success: boolean;
-	message: string;
-	data: T | null;
+  success: boolean;
+  message: string;
+  data: T | null;
 }
 
 interface JwtAuthData {
-	accessToken: string;
-	tokenType: string;
-	user: {
-		id: number;
-		username: string;
-		email: string;
-	};
+  accessToken: string;
+  tokenType: string;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+  };
 }
 
 interface SignupResponse extends ApiResponse<JwtAuthData> {}
 
 export function SignupForm({
-	className,
-	...props
+  className,
+  ...props
 }: React.ComponentProps<"form">) {
-	const [username, setUsername] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
-	const [error, setError] = useState("");
-	const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		setError("");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
 
-		if (password !== confirmPassword) {
-			setError("Passwords do not match");
-			return;
-		}
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
-		try {
-			const res = await fetch("http://localhost:8080/api/auth/register", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Accept: "application/json",
-				},
-				body: JSON.stringify({ username, email, password }),
-			});
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-			const data: SignupResponse = await res.json();
+      const data: SignupResponse = await res.json();
 
-			if (!res.ok) {
-				throw new Error(data.message || "Registration failed");
-			}
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
 
-			if (data.data) {
-				// Store JWT token and user data
-				setToken(data.data.accessToken);
-				setUser(data.data.user);
-				
-				console.log("Registered successfully:", data);
-				// Redirect to dashboard
-				navigate("/home");
-			}
-		} catch (err) {
-			console.error("Registration error:", err);
-			if (err instanceof Error) {
-				setError(err.message);
-			} else {
-				setError("Something went wrong");
-			}
-		}
-	};
+      if (data.data) {
+        // Store JWT token and user data
+        setToken(data.data.accessToken);
+        setUser(data.data.user);
 
-	return (
-		<form
-			className={cn("flex flex-col gap-6", className)}
-			onSubmit={handleSubmit}
-			{...props}
-		>
-			<div className="flex flex-col items-center gap-2 text-center">
-				<h1 className="text-xl font-medium">Register a new account</h1>
-				{/* <p className="text-muted-foreground text-sm text-balance">
+        console.log("Registered successfully:", data);
+        // Redirect to dashboard
+        navigate("/home");
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong");
+      }
+    }
+  };
+
+  return (
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      onSubmit={handleSubmit}
+      {...props}
+    >
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-xl font-medium">Register a new account</h1>
+        {/* <p className="text-muted-foreground text-sm text-balance">
           Enter your email below to login to your account
         </p> */}
-			</div>
-			<div className="grid gap-6">
-				<div className="grid gap-3">
-					<Label htmlFor="username">Username</Label>
-					<Input
-						id="username"
-						type="text"
-						value={username}
-						onChange={(e) => setUsername(e.target.value)}
-						placeholder="username"
-						required
-					/>
-				</div>
-				<div className="grid gap-3">
-					<Label htmlFor="email">Email</Label>
-					<Input
-						id="email"
-						type="email"
-						value={email}
-						onChange={(e) => setEmail(e.target.value)}
-						placeholder="m@example.com"
-						required
-					/>
-				</div>
-				<div className="grid gap-3">
-					<div className="flex items-center">
-						<Label htmlFor="password">Password</Label>
-					</div>
-					<Input
-						id="password"
-						type="password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						required
-					/>
-				</div>
+      </div>
+      <div className="grid gap-6">
+        <div className="grid gap-3">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            id="username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="username"
+            required
+          />
+        </div>
+        <div className="grid gap-3">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="m@example.com"
+            required
+          />
+        </div>
+        <div className="grid gap-3">
+          <div className="flex items-center">
+            <Label htmlFor="password">Password</Label>
+          </div>
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
 
-				<div className="grid gap-3">
-					<div className="flex items-center">
-						{/* not edited the htmlFor */}
-						<Label htmlFor="confirmPassword">Confirm Password</Label>
-					</div>
-					<Input
-						id="password"
-						type="password"
-						value={confirmPassword}
-						onChange={(e) => setConfirmPassword(e.target.value)}
-						required
-					/>
-				</div>
+        <div className="grid gap-3">
+          <div className="flex items-center">
+            {/* not edited the htmlFor */}
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+          </div>
+          <Input
+            id="password"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
 
-				<Button type="submit" className="w-full">
-					Register
-				</Button>
+        <Button type="submit" className="w-full bg-primary !bg-[#eddea4]">
+          Register
+        </Button>
 
-				{error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
-				{/* <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+        {/* <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-background text-muted-foreground relative z-10 px-2">
             Or continue with
           </span>
@@ -172,4 +172,3 @@ export function SignupForm({
     </form>
   );
 }
-

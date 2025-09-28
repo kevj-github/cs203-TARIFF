@@ -2,8 +2,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react"; 
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface LoginResponse {
   token: string;
@@ -20,6 +20,7 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,6 +37,7 @@ export function LoginForm({
 
       const data: LoginResponse = await res.json();
       console.log("Logged in:", data);
+      navigate("/home");
 
       // TODO: if you want, store token in localStorage/sessionStorage here
     } catch (err) {
@@ -90,7 +92,7 @@ export function LoginForm({
             required
           />
         </div>
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full bg-primary !bg-[#eddea4]">
           Login
         </Button>
 

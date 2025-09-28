@@ -70,6 +70,7 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API docs
                 .requestMatchers("/api/products/**").permitAll() // Public product endpoints
                 .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
+                .requestMatchers("/calculate").permitAll() //Calculator endpoints
                 .anyRequest().authenticated() // All other endpoints require authentication
             )
             .sessionManagement(session -> session

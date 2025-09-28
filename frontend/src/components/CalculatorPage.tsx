@@ -36,7 +36,6 @@ import {
 import { useState } from "react";
 import { CalculationResultCard } from "./CalculationResultCard";
 
-
 const countries = [
   { label: "Singapore", value: "SG" },
   { label: "United States", value: "US" },
@@ -46,29 +45,49 @@ const countries = [
   { label: "Indonesia", value: "ID" },
 ];
 
-
 // PC Components
 const pcComponents = [
-  { code: "8473.30", name: "Solid State Drives (SSD)" },
+  { code: "8473.30", name: "CPU" },
+  { code: "8473.40", name: "GPU" },
+  { code: "8542.33", name: "Electronic Integrated Circuits - Amplifiers" },
+  { code: "8542.32", name: "Electronic Integrated Circuits - Memories" },
   { code: "8471.70", name: "Hard Disk Drives (HDD)" },
-  { code: "8473.50", name: "RAM Modules" },
-  { code: "8471.50", name: "CPUs" },
-  { code: "8471.60", name: "GPUs" },
+  { code: "8504.40", name: "Power Supply Units" },
+  { code: "8473.50", name: "RAM" },
+  { code: "8542.31", name: "Semiconductors/Processors" },
+  { code: "8473.10", name: "Solid State Drives (SSD)" },
 ];
 
 // Consumer Electronics
 const consumerElectronics = [
-  { code: "8517.12", name: "Mobile Phones" },
-  { code: "8471.30", name: "Laptops" },
+  { code: "8528.59", name: "Computer Monitors" },
+  { code: "8471.30", name: "Laptops/Portable computers" },
+  { code: "8517.12", name: "Smartphones" },
   { code: "8471.41", name: "Tablets" },
   { code: "8528.72", name: "Televisions (LCD/LED)" },
-  { code: "8528.59", name: "Computer Monitors" },
+  { code: "8528.52", name: "Television Receivers - CRT" },
+  { code: "8528.73", name: "Television Receivers - Other" },
 ];
 
 // Power & Support
 const powerSupport = [
-  { code: "8504.40", name: "Power Supply Units" },
-  { code: "8473.20", name: "Motherboards" },
+  { code: "8471.80", name: "Computer Units - Other" },
+  { code: "8471.41", name: "Data Processing Machines - Digital" },
+  { code: "8471.49", name: "Data Processing Machines - Other" },
+  { code: "8471.50", name: "Digital Processing Units" },
+  { code: "8471.60", name: "Input/Output Units" },
+  { code: "8507.60", name: "Lithium-ion Batteries" },
+  { code: "8507.80", name: "Lithium Batteries - Other" },
+
+  // { code: "8473.20", name: "Motherboards" },
+];
+
+const communication = [
+  { code: "3801.20", name: "Colloidal/Semi-colloidal Graphite" },
+  { code: "8544.42", name: "Electric Conductors - Fitted with Connectors" },
+  { code: "8544.49", name: "Electric Conductors - Other" },
+  { code: "9013.80", name: "Optical Devices - Other" },
+  { code: "8517.13", name: "Satellite Communication Equipment" },
 ];
 
 const FormSchema = z.object({
@@ -84,7 +103,6 @@ const FormSchema = z.object({
 export default function CalculatorPage() {
   const [result, setResult] = useState<any | null>(null); // store backend result
   const [loading, setLoading] = useState(false);
-
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -115,12 +133,16 @@ export default function CalculatorPage() {
         // quantity: data.quantity,
       };
 
+      const token = localStorage.getItem("token");
+
       const response = await fetch("http://localhost:8080/calculate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          // Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
+        // credentials: "include",
       });
 
       if (!response.ok) {
@@ -141,253 +163,264 @@ export default function CalculatorPage() {
     } finally {
       setLoading(false);
     }
-
+  }
 
   return (
-    <div className="p-3">
-      <h1 className="text-2xl font-bold mb-4">Tariff Calculator</h1>
+    <>
+      <div className="p-3">
+        <h1 className="text-2xl font-bold mb-4">Tariff Calculator</h1>
 
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid gap-6 md:grid-cols-2"
-        >
-          {/* Origin */}
-          <FormField
-            control={form.control}
-            name="origin"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Origin Country</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-[inherit] ">
-                    <SelectValue placeholder="Select origin country" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white ">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid gap-6 md:grid-cols-2"
+          >
+            {/* Origin */}
+            <FormField
+              control={form.control}
+              name="origin"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Origin Country</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-[inherit] ">
+                      <SelectValue placeholder="Select origin country" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white ">
+                      <SelectGroup>
+                        <SelectLabel>Countries</SelectLabel>
+                        {countries.map((c) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={c.value}
+                            value={c.value}
+                          >
+                            {c.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
 
-                    <SelectGroup>
-                      <SelectLabel>Countries</SelectLabel>
-                      {countries.map((c) => (
-                        <SelectItem
-                          className="font-bold cursor-pointer hover:bg-indigo-100"
+            {/* Destination */}
+            <FormField
+              control={form.control}
+              name="dest"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Destination Country</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-[inherit]">
+                      <SelectValue placeholder="Select destination country" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white ">
+                      <SelectGroup>
+                        <SelectLabel>Countries</SelectLabel>
+                        {countries.map((c) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={c.value}
+                            value={c.value}
+                          >
+                            {c.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
 
-                          key={c.value}
-                          value={c.value}
+            {/* Product Category */}
+            <FormField
+              control={form.control}
+              name="hs"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Category</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-[inherit]">
+                      <SelectValue placeholder="Select product" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectGroup>
+                        <SelectLabel>PC Components</SelectLabel>
+                        {pcComponents.map((item) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={item.code}
+                            value={item.code}
+                          >
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+
+                      <SelectGroup>
+                        <SelectLabel>Consumer Electronics</SelectLabel>
+                        {consumerElectronics.map((item) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={item.code}
+                            value={item.code}
+                          >
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+
+                      <SelectGroup>
+                        <SelectLabel>Power & Support</SelectLabel>
+                        {powerSupport.map((item) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={item.code}
+                            value={item.code}
+                          >
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+
+                      <SelectGroup>
+                        <SelectLabel>Communication</SelectLabel>
+                        {communication.map((item) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={item.code}
+                            value={item.code}
+                          >
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="on"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Import Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[full] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
                         >
-                          {c.label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <FormMessage className="text-red-500" />
+                          {field.value ? (
+                            format(new Date(field.value), "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto p-0 bg-white"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
+                        onSelect={(date) =>
+                          field.onChange(date ? format(date, "yyyy-MM-dd") : "")
+                        }
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        captionLayout="dropdown"
+                      />
+                    </PopoverContent>
+                  </Popover>
 
-              </FormItem>
-            )}
-          />
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
 
-          {/* Destination */}
-          <FormField
-            control={form.control}
-            name="dest"
+            {/* Product Value */}
+            <FormField
+              control={form.control}
+              name="customsValue"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Value (USD)</FormLabel>
 
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Destination Country</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-[inherit]">
-                    <SelectValue placeholder="Select destination country" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white ">
-
-                    <SelectGroup>
-                      <SelectLabel>Countries</SelectLabel>
-                      {countries.map((c) => (
-                        <SelectItem
-                          className="font-bold cursor-pointer hover:bg-indigo-100"
-
-                          key={c.value}
-                          value={c.value}
-                        >
-                          {c.label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <FormMessage className="text-red-500" />
-
-              </FormItem>
-            )}
-          />
-
-          {/* Product Category */}
-          <FormField
-            control={form.control}
-            name="hs"
-
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Category</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-[inherit]">
-                    <SelectValue placeholder="Select product" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectGroup>
-                      <SelectLabel>PC Components</SelectLabel>
-                      {pcComponents.map((item) => (
-                        <SelectItem
-                          className="font-bold cursor-pointer hover:bg-indigo-100"
-                          key={item.code}
-                          value={item.code}
-                        >
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-
-                    <SelectGroup>
-                      <SelectLabel>Consumer Electronics</SelectLabel>
-                      {consumerElectronics.map((item) => (
-                        <SelectItem
-                          className="font-bold cursor-pointer hover:bg-indigo-100"
-                          key={item.code}
-                          value={item.code}
-                        >
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-
-                    <SelectGroup>
-                      <SelectLabel>Power & Support</SelectLabel>
-                      {powerSupport.map((item) => (
-                        <SelectItem
-                          className="font-bold cursor-pointer hover:bg-indigo-100"
-                          key={item.code}
-                          value={item.code}
-                        >
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <FormMessage className="text-red-500" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="on"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Import Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[full] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(new Date(field.value), "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-white" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) =>
-                        field.onChange(date ? format(date, "yyyy-MM-dd") : "")
-                      }
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      captionLayout="dropdown"
+                  <FormControl>
+                    <Input
+                      className="focus-visible:border-ring focus-visible:ring-ring/50"
+                      type="number"
+                      placeholder="1000"
+                      {...field}
                     />
-                  </PopoverContent>
-                </Popover>
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
 
-                <FormMessage className="text-red-500" />
+            {/* Product Quantity */}
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantity</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="focus-visible:border-ring focus-visible:ring-ring/50"
+                      type="number"
+                      placeholder="Minimum quantity of 1"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
 
-              </FormItem>
-            )}
+            {/* Submit */}
+            <div className="col-span-full flex justify-end">
+              <Button
+                type="submit"
+                className="!bg-[#eddea4]"
+                disabled={loading}
+              >
+                {loading ? "Calculating..." : "Calculate"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+
+        {/* Display Result */}
+        {result && (
+          <CalculationResultCard
+            baseDuty={result.baseDuty}
+            total={result.total}
+            ruleApplied={result.ruleApplied}
+            error={result.error}
           />
-
-          {/* Product Value */}
-          <FormField
-            control={form.control}
-            name="customsValue"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Value (USD)</FormLabel>
-
-                <FormControl>
-                  <Input
-                    className="focus-visible:border-ring focus-visible:ring-ring/50"
-                    type="number"
-                    placeholder="1000"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-500" />
-              </FormItem>
-            )}
-          />
-
-          {/* Product Quantity */}
-          <FormField
-            control={form.control}
-            name="quantity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quantity</FormLabel>
-                <FormControl>
-                  <Input
-                    className="focus-visible:border-ring focus-visible:ring-ring/50"
-                    type="number"
-                    placeholder="Minimum quantity of 1"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-500" />
-
-              </FormItem>
-            )}
-          />
-
-          {/* Submit */}
-          <div className="col-span-full flex justify-end">
-            <Button type="submit" className="!bg-[#eddea4]" disabled={loading}>
-              {loading ? "Calculating..." : "Calculate"}
-            </Button>
-          </div>
-        </form>
-      </Form>
-
-      {/* Display Result */}
-      {result && (
-        <CalculationResultCard
-          baseDuty={result.baseDuty}
-          total={result.total}
-          ruleApplied={result.ruleApplied}
-          error={result.error}
-        />
-      )}
-
-
-    </div>
+        )}
+      </div>
+    </>
   );
-}
 }
