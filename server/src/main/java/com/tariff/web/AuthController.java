@@ -71,7 +71,7 @@ public class AuthController {
         }
     }
 
-     @GetMapping("/me")
+     @GetMapping("/profile")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

@@ -15,6 +15,12 @@ spring:
 server:
   port: 8080
 
+# JWT Configuration
+app:
+  jwt:
+    secret: myVerySecureJWTSecretKeyThatShouldBeAtLeast64CharactersLongForHS512Algorithm
+    expiration: 86400000  # 24 hours in milliseconds
+
 # ------------------------
 # Dev Profile (H2 In-memory for local development)
 # ------------------------
@@ -36,6 +42,12 @@ spring:
       ddl-auto: create-drop  # Clean slate each restart for dev
   flyway:
     enabled: false  # Disable for H2 development
+
+# JWT Configuration for Dev (optional override)
+app:
+  jwt:
+    secret: devSecretKeyThatIsLongEnoughForHS512AlgorithmToWorkProperly123456789
+    expiration: 86400000
 
 # ------------------------
 # Prod Profile (Supabase PostgreSQL via Session Pooler)
@@ -59,6 +71,12 @@ spring:
   flyway:
     enabled: false  # Disable Flyway for now
 
+# JWT Configuration for Prod
+app:
+  jwt:
+    secret: ${JWT_SECRET:prodSecretKeyThatShouldBeStoredAsEnvironmentVariableInProduction}
+    expiration: 86400000  # 24 hours
+
 # ------------------------
 # Direct Profile (Alternative Supabase connection for IPv6 hosts)
 # ------------------------
@@ -80,3 +98,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: false  # Disable Flyway for now
+
+# JWT Configuration for Direct
+app:
+  jwt:
+    secret: ${JWT_SECRET:directSecretKeyForAlternativeConnectionMethodThatIsSecure}
+    expiration: 86400000
