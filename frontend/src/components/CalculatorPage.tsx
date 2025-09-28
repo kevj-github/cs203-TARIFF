@@ -74,7 +74,7 @@ const FormSchema = z.object({
   dest: z.string().min(1, "Please select destination country."),
   hs: z.string().min(1, "Please select a product category."),
   customsValue: z.string().min(1, "Product value is required."),
-  quantity: z.string().min(1, "Quantity is required."),
+  quantity: z.string().min(0, "Quantity is required."),
   // on: z.date().min(1, "Please select import date."),
   on: z.string().min(1, "Please select import date."),
 });
