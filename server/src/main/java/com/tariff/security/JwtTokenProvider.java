@@ -25,9 +25,8 @@ public class JwtTokenProvider {
     private long jwtExpirationMs;
 
     private Key getSigningKey() {
-        // Use Keys.secretKeyFor to generate a key that's guaranteed to be secure for HS512
-        // This addresses the RFC 7518 requirement for key size >= 512 bits
-        return Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        // Use the configured secret consistently for both signing and validation
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
     public String generateToken(Authentication authentication) {
@@ -77,9 +76,15 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
-            return true;
+            return !isTokenExpired(token);
         } catch (Exception e) {
+            System.out.println("Token validation failed: " + e.getMessage()); // Debug logging
             return false;
         }
+    }
+
+    private boolean isTokenExpired(String token) {
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(new Date());
     }
 }

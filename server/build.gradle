@@ -2,6 +2,15 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+    id "org.flywaydb.flyway" version "10.17.0"
+
+}
+
+flyway {
+    url = 'jdbc:postgresql://db.xizwjutjdldhrthleubs.supabase.co:5432/postgres'
+    user = 'postgres'
+    password = 'jY8MbHb4bg_hij!'
+    schemas = ['public']
 }
 
 group = 'com.tariff'

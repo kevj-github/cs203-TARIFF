@@ -3,6 +3,7 @@ import { GalleryVerticalEnd, LucideCroissant } from "lucide-react";
 import { LoginForm } from "@/components/login-form";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
+
 import tariffImg from "../assets/tariff.png";
 import { SignupForm } from "./signup-form";
 
@@ -31,6 +32,7 @@ export default function SignupPage() {
         autoplay
         className="hidden lg:flex items-center justify-center w-full h-full mx-auto object-contain"
       />
+
     </div>
   );
 }

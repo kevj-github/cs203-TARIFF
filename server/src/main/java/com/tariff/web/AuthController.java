@@ -5,6 +5,7 @@ import com.tariff.security.JwtTokenProvider;
 import com.tariff.service.UserService;
 import com.tariff.web.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -68,5 +69,20 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Invalid username or password"));
         }
+    }
+
+     @GetMapping("/profile")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                 .body(ApiResponse.error("Not logged in"));
+        }
+
+        String username = authentication.getName();
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserResponse userResponse = UserResponse.fromUser(user);
+        return ResponseEntity.ok(ApiResponse.success("Current user fetched", userResponse));
     }
 }

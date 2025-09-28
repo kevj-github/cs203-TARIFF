@@ -36,6 +36,7 @@ import {
 import { useState } from "react";
 import { CalculationResultCard } from "./CalculationResultCard";
 
+
 const countries = [
   { label: "Singapore", value: "SG" },
   { label: "United States", value: "US" },
@@ -44,6 +45,7 @@ const countries = [
   { label: "Germany", value: "DE" },
   { label: "Indonesia", value: "ID" },
 ];
+
 
 // PC Components
 const pcComponents = [
@@ -82,6 +84,7 @@ const FormSchema = z.object({
 export default function CalculatorPage() {
   const [result, setResult] = useState<any | null>(null); // store backend result
   const [loading, setLoading] = useState(false);
+
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -138,7 +141,7 @@ export default function CalculatorPage() {
     } finally {
       setLoading(false);
     }
-  }
+
 
   return (
     <div className="p-3">
@@ -161,11 +164,13 @@ export default function CalculatorPage() {
                     <SelectValue placeholder="Select origin country" />
                   </SelectTrigger>
                   <SelectContent className="bg-white ">
+
                     <SelectGroup>
                       <SelectLabel>Countries</SelectLabel>
                       {countries.map((c) => (
                         <SelectItem
                           className="font-bold cursor-pointer hover:bg-indigo-100"
+
                           key={c.value}
                           value={c.value}
                         >
@@ -176,6 +181,7 @@ export default function CalculatorPage() {
                   </SelectContent>
                 </Select>
                 <FormMessage className="text-red-500" />
+
               </FormItem>
             )}
           />
@@ -184,6 +190,7 @@ export default function CalculatorPage() {
           <FormField
             control={form.control}
             name="dest"
+
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Destination Country</FormLabel>
@@ -192,11 +199,13 @@ export default function CalculatorPage() {
                     <SelectValue placeholder="Select destination country" />
                   </SelectTrigger>
                   <SelectContent className="bg-white ">
+
                     <SelectGroup>
                       <SelectLabel>Countries</SelectLabel>
                       {countries.map((c) => (
                         <SelectItem
                           className="font-bold cursor-pointer hover:bg-indigo-100"
+
                           key={c.value}
                           value={c.value}
                         >
@@ -207,6 +216,7 @@ export default function CalculatorPage() {
                   </SelectContent>
                 </Select>
                 <FormMessage className="text-red-500" />
+
               </FormItem>
             )}
           />
@@ -215,6 +225,7 @@ export default function CalculatorPage() {
           <FormField
             control={form.control}
             name="hs"
+
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Category</FormLabel>
@@ -309,6 +320,7 @@ export default function CalculatorPage() {
                 </Popover>
 
                 <FormMessage className="text-red-500" />
+
               </FormItem>
             )}
           />
@@ -320,6 +332,7 @@ export default function CalculatorPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Value (USD)</FormLabel>
+
                 <FormControl>
                   <Input
                     className="focus-visible:border-ring focus-visible:ring-ring/50"
@@ -349,6 +362,7 @@ export default function CalculatorPage() {
                   />
                 </FormControl>
                 <FormMessage className="text-red-500" />
+
               </FormItem>
             )}
           />
@@ -371,6 +385,8 @@ export default function CalculatorPage() {
           error={result.error}
         />
       )}
+
+
     </div>
   );
 }
