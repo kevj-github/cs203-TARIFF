@@ -51,7 +51,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
             
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -60,14 +60,14 @@ public class AuthController {
             String token = tokenProvider.generateToken(authentication);
             
             // Get user details
-            User user = userService.findByUsername(request.getUsername())
+            User user = userService.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             UserResponse userResponse = UserResponse.fromUser(user);
             
             return ResponseEntity.ok(ApiResponse.success("Login successful!", 
                 new JwtAuthResponse(token, userResponse)));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("Invalid username or password"));
+            return ResponseEntity.badRequest().body(ApiResponse.error("Invalid email or password"));
         }
     }
 
