@@ -65,12 +65,11 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll() // Auth endpoints
-                .requestMatchers("/api/auth/**").authenticated() // All other auth endpoints require authentication
                 .requestMatchers("/api/public/**").permitAll() // Public endpoints
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API docs
-                .requestMatchers("/api/products/**").permitAll() // Public product endpoints
+                .requestMatchers("/api/products/**").authenticated() // Public product endpoints
                 .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
-                .requestMatchers("/calculate").permitAll() //Calculator endpoints
+                .requestMatchers("/calculate").authenticated() //Calculator endpoints
                 .anyRequest().authenticated() // All other endpoints require authentication
             )
             .sessionManagement(session -> session
