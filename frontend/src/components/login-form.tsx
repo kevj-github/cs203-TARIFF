@@ -37,7 +37,7 @@ export function LoginForm({
 
       const data: LoginResponse = await res.json();
       console.log("Logged in:", data);
-      navigate("/home");
+      // navigate("/home");
 
       // TODO: if you want, store token in localStorage/sessionStorage here
     } catch (err) {

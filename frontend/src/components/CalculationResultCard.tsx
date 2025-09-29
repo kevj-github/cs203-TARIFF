@@ -107,7 +107,7 @@ export function CalculationResultCard({
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-bold text-blue-800 text-right">
-                      {baseDuty}
+                      {baseDuty} USD
                     </p>
                   </CardContent>
                 </Card>
@@ -130,7 +130,7 @@ export function CalculationResultCard({
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-bold text-green-800 text-right">
-                      {total}
+                      {total} USD
                     </p>
                   </CardContent>
                 </Card>
