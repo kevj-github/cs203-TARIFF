@@ -79,8 +79,7 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
-            .headers(headers -> headers.frameOptions().disable()); // For H2 console
-
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()));
         return http.build();
     }
 }
