@@ -1,4 +1,4 @@
-package com.tariff.web.dto;
+package com.tariff.api.dto;
 
 public class RegisterRequest {
     private String username;

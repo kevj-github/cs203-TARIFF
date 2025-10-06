@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/calculate")
+@RequestMapping("/api/calculate")
 public class CalcController {
 
     private final CalculationService calculationService;

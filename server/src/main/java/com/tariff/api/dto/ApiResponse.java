@@ -1,4 +1,4 @@
-package com.tariff.web.dto;
+package com.tariff.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

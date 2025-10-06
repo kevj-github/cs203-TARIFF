@@ -1,9 +1,14 @@
-package com.tariff.web;
+package com.tariff.api;
 
+import com.tariff.api.dto.ApiResponse;
+import com.tariff.api.dto.JwtAuthResponse;
+import com.tariff.api.dto.LoginRequest;
+import com.tariff.api.dto.RegisterRequest;
+import com.tariff.api.dto.UserResponse;
 import com.tariff.domain.User;
 import com.tariff.security.JwtTokenProvider;
 import com.tariff.service.UserService;
-import com.tariff.web.dto.*;
+import com.tariff.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

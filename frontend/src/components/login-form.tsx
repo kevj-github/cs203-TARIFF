@@ -4,14 +4,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { setToken, setUser } from "@/lib/auth";
 
-interface LoginResponse {
-  token: string;
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T | null;
+}
+
+interface JwtAuthData {
+  accessToken: string;
+  tokenType: string;
   user: {
     id: number;
+    username: string;
     email: string;
   };
 }
+
+interface LoginResponse extends ApiResponse<JwtAuthData> {}
 
 export function LoginForm({
   className,
@@ -40,10 +51,16 @@ export function LoginForm({
       if (!res.ok) throw new Error("Invalid email or password");
 
       const data: LoginResponse = await res.json();
-      console.log("Logged in:", data);
-      navigate("/home");
+      if (data.data) {
+        // Store JWT token and user data
+        setToken(data.data.accessToken);
+        setUser(data.data.user);
 
-      // TODO: if you want, store token in localStorage/sessionStorage here
+        console.log("Login successfully:", data);
+        // Redirect to dashboard
+        navigate("/home");
+      }
+
     } catch (err) {
       console.error("Login error:", err);
       if (err instanceof Error) {

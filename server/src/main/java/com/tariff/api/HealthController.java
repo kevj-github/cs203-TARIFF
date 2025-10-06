@@ -1,4 +1,4 @@
-package com.tariff.web;
+package com.tariff.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

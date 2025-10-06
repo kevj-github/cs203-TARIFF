@@ -1,4 +1,4 @@
-package com.tariff.web.dto;
+package com.tariff.api.dto;
 
 import lombok.Data;
 import com.tariff.domain.User;

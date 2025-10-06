@@ -1,4 +1,4 @@
-package com.tariff.web;
+package com.tariff.api;
 
 import com.tariff.domain.Product;
 import com.tariff.repo.ProductRepository;
