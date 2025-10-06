@@ -12,16 +12,15 @@ This project helps technology hardware companies simplify and automate tariff ca
 - **Backend:** Spring Boot, Spring Security (JWT), Swagger UI  
 - **Database:** PostgreSQL (Supabase)  
 - **Frontend:** React + TailwindCSS (Vercel deploy)  
-- **Deployment:** Render / Railway (backend), Vercel (frontend)  
+- **Deployment:** Deployed Locally, Vite (frontend)  
 
 ---
 
 ## Features
 - **User Auth** – Register, Login, JWT-based security  
-- **Products CRUD** – Manage hardware products + HS codes  
+- **Products CRUD (Through API)** – Manage hardware products + HS codes  
 - **Tariff Calculator** – Estimate duties (SG ↔ US first)  
-- **History** – Save & view past calculations  
-- **Visualization (Optional)** – Charts, comparisons, what-if simulator  
+- **Visualization (Dashboard)** – Charts, comparisons, what-if simulator  
 
 ---
 
@@ -91,5 +90,8 @@ Delete branch after merge
 
 
 # Team Roles
-
-(to be added)
+Clemira - Scrum Master
+Calvin - Backend Logic
+Daniella - Frontend Desgin
+Kevin - Security & API Implementation
+Liam - Database Research & Management
