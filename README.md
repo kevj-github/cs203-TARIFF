@@ -1,4 +1,4 @@
-# CSD G6 Project – Tariff Calculator
+# CSD G5 Group 6 Project – Tariff Calculator
 
 ## Overview
 This project helps technology hardware companies simplify and automate tariff calculations for products such as CPUs, GPUs, and consumer electronics.  
