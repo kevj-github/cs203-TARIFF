@@ -11,7 +11,7 @@ This project helps technology hardware companies simplify and automate tariff ca
 ## Tech Stack
 - **Backend:** Spring Boot, Spring Security (JWT), Swagger UI  
 - **Database:** PostgreSQL (Supabase)  
-- **Frontend:** React + TailwindCSS (Vercel deploy)  
+- **Frontend:** React + TailwindCSS (to be implemented AWS deploy)  
 - **Deployment:** Deployed Locally, Vite (frontend)  
 
 ---
@@ -90,7 +90,7 @@ Delete branch after merge
 
 
 # Team Roles
-Clemira - Scrum Master
+Clemira - Scrum Master, Code Reviewer & Database Management
 Calvin - Backend Logic
 Daniella - Frontend Desgin
 Kevin - Security & API Implementation
