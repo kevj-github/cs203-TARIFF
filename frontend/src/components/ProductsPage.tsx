@@ -25,10 +25,19 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchProducts() {
+    const fetchProducts = async () => {
       try {
+        const token = localStorage.getItem("token"); // Retrieve token
+        const headers: HeadersInit = {
+          "Content-Type": "application/json",
+        };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
 
-        const res = await fetch("http://localhost:8080/api/products");
+        const res = await fetch("http://localhost:8080/api/products", {
+          headers: headers,
+        });
         const data = await res.json();
         setProducts(data);
       } catch (err) {

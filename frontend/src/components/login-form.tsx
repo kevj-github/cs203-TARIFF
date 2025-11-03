@@ -27,9 +27,13 @@ export function LoginForm({
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/login", {
+      const res = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        
         body: JSON.stringify({ email, password }),
       });
 
@@ -37,7 +41,7 @@ export function LoginForm({
 
       const data: LoginResponse = await res.json();
       console.log("Logged in:", data);
-      // navigate("/home");
+      navigate("/home");
 
       // TODO: if you want, store token in localStorage/sessionStorage here
     } catch (err) {
