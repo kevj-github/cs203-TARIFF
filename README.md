@@ -1,4 +1,4 @@
-# CSD G6 Project – Tariff Calculator
+# CSD G5 Group 6 Project – Tariff Calculator
 
 ## Overview
 This project helps technology hardware companies simplify and automate tariff calculations for products such as CPUs, GPUs, and consumer electronics.  
@@ -11,17 +11,16 @@ This project helps technology hardware companies simplify and automate tariff ca
 ## Tech Stack
 - **Backend:** Spring Boot, Spring Security (JWT), Swagger UI  
 - **Database:** PostgreSQL (Supabase)  
-- **Frontend:** React + TailwindCSS (Vercel deploy)  
-- **Deployment:** Render / Railway (backend), Vercel (frontend)  
+- **Frontend:** React + TailwindCSS (to be implemented AWS deploy)  
+- **Deployment:** Deployed Locally, Vite (frontend)  
 
 ---
 
 ## Features
 - **User Auth** – Register, Login, JWT-based security  
-- **Products CRUD** – Manage hardware products + HS codes  
+- **Products CRUD (Through API)** – Manage hardware products + HS codes  
 - **Tariff Calculator** – Estimate duties (SG ↔ US first)  
-- **History** – Save & view past calculations  
-- **Visualization (Optional)** – Charts, comparisons, what-if simulator  
+- **Visualization (Dashboard)** – Charts, comparisons, what-if simulator  
 
 ---
 
@@ -91,5 +90,8 @@ Delete branch after merge
 
 
 # Team Roles
-
-(to be added)
+Clemira - Scrum Master, Code Reviewer & Database Management
+Calvin - Backend Logic
+Daniella - Frontend Desgin
+Kevin - Security & API Implementation
+Liam - Database Research & Management
