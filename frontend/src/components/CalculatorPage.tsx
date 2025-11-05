@@ -626,6 +626,33 @@ export default function CalculatorPage() {
 						total={result.total}
 						ruleApplied={result.ruleApplied}
 						error={result.error}
+						customsValue={Number(form.getValues("customsValue"))}
+						quantity={Number(form.getValues("quantity"))}
+						indirectTax={result.indirectTax || 0}
+						origin={form.getValues("origin")}
+						dest={form.getValues("dest")}
+						hs={form.getValues("hs")}
+						onSave={async (notes) => {
+							const selectedItem = [...pcComponents, ...consumerElectronics, ...powerSupport].find(
+								(item) => String(item.id) === form.getValues("hs")
+							);
+
+							const payload = {
+								origin: form.getValues("origin"),
+								dest: form.getValues("dest"),
+								hs: selectedItem?.code || "",
+								customsValue: Number(form.getValues("customsValue")),
+								quantity: Number(form.getValues("quantity")),
+								baseDuty: result.baseDuty,
+								total: result.total,
+								ruleApplied: result.ruleApplied,
+								indirectTax: result.indirectTax || 0,
+								calculatedAt: new Date().toISOString(),
+								notes
+							};
+
+							await api.post("/calculations", payload);
+						}}
 					/>
 				)}
 			</div>

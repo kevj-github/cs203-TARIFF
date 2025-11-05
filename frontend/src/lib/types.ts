@@ -15,3 +15,19 @@ export interface TariffRuleResponse {
 	validFrom?: string;
 	validTo?: string;
 }
+
+export interface SavedCalculation {
+	id?: number;
+	userId: number;
+	origin: string;
+	dest: string;
+	hs: string;
+	customsValue: number;
+	quantity: number;
+	baseDuty: number;
+	total: number;
+	ruleApplied: string;
+	indirectTax?: number;
+	calculatedAt: string;
+	notes?: string;
+}
