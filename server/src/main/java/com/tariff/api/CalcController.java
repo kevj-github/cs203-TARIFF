@@ -1,5 +1,7 @@
 package com.tariff.api;
 
+import com.tariff.api.dto.ApiResponse;
+import org.springframework.http.ResponseEntity;
 import com.tariff.api.dto.CalculationDtos.CalculationRequest;
 import com.tariff.api.dto.CalculationDtos.CalculationResponse;
 import com.tariff.service.CalculationService;
@@ -19,7 +21,8 @@ public class CalcController {
 
     @Operation(summary = "Calculate tariff duty (ad valorem / specific)")
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public CalculationResponse calculate(@Valid @RequestBody CalculationRequest req) {
-        return calculationService.calculate(req);
+    public ResponseEntity<ApiResponse<CalculationResponse>> calculate(@Valid @RequestBody CalculationRequest req) {
+        CalculationResponse result = calculationService.calculate(req);
+        return ResponseEntity.ok(ApiResponse.success("Calculation completed successfully", result));
     }
 }

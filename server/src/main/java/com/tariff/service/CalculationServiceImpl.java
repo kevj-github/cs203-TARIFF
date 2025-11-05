@@ -3,6 +3,8 @@ package com.tariff.service;
 import com.tariff.api.dto.CalculationDtos.CalculationRequest;
 import com.tariff.api.dto.CalculationDtos.CalculationResponse;
 import com.tariff.domain.TariffRule;
+import com.tariff.domain.RuleType;
+import com.tariff.domain.RateUnit;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,14 +22,23 @@ public class CalculationServiceImpl implements CalculationService {
 
     @Override
     public CalculationResponse calculate(CalculationRequest req) {
-        // find all rules that match origin/dest/HS/date
-        List<TariffRule> rules = tariffRuleService.findApplicable(req.origin, req.dest, req.hs, req.on);
-        if (rules.isEmpty()) {
-            throw new IllegalArgumentException("No applicable tariff rule found for given parameters and date.");
-        }
+        TariffRule rule;
 
-        // take the most recent
-        TariffRule rule = rules.get(0);
+        // If simulation mode is enabled, create a simulated rule
+        if (req.simulation != null) {
+            rule = new TariffRule();
+            rule.setType(RuleType.valueOf(req.simulation.taxType));
+            rule.setRate(BigDecimal.valueOf(req.simulation.taxRate));
+            rule.setUnit(req.simulation.taxType.equals("SPECIFIC") ? RateUnit.USD_PER_UNIT : RateUnit.PERCENT);
+        } else {
+            // find all rules that match origin/dest/HS/date
+            List<TariffRule> rules = tariffRuleService.findApplicable(req.origin, req.dest, req.hs, req.on);
+            if (rules.isEmpty()) {
+                throw new IllegalArgumentException("No applicable tariff rule found for given parameters and date.");
+            }
+            // take the most recent
+            rule = rules.get(0);
+        }
 
         BigDecimal customsTotal = req.customsValue.multiply(BigDecimal.valueOf(req.quantity));
         BigDecimal baseDuty;
@@ -65,4 +76,3 @@ public class CalculationServiceImpl implements CalculationService {
         return resp;
     }
 }
-
