@@ -1,9 +1,14 @@
-package com.tariff.web;
+package com.tariff.api;
 
+import com.tariff.api.dto.ApiResponse;
+import com.tariff.api.dto.JwtAuthResponse;
+import com.tariff.api.dto.LoginRequest;
+import com.tariff.api.dto.RegisterRequest;
+import com.tariff.api.dto.UserResponse;
 import com.tariff.domain.User;
 import com.tariff.security.JwtTokenProvider;
 import com.tariff.service.UserService;
-import com.tariff.web.dto.*;
+import com.tariff.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +27,8 @@ public class AuthController {
     private final JwtTokenProvider tokenProvider;
 
     @Autowired
-    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
+    public AuthController(UserService userService, AuthenticationManager authenticationManager,
+            JwtTokenProvider tokenProvider) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
@@ -35,13 +41,13 @@ public class AuthController {
                     request.getUsername(),
                     request.getEmail(),
                     request.getPassword());
-            
+
             // Generate token for newly registered user
-            String token = tokenProvider.generateToken(user.getUsername());
+            String token = tokenProvider.generateToken(user.getEmail());
             UserResponse userResponse = UserResponse.fromUser(user);
-            
-            return ResponseEntity.ok(ApiResponse.success("Registration successful!", 
-                new JwtAuthResponse(token, userResponse)));
+
+            return ResponseEntity.ok(ApiResponse.success("Registration successful!",
+                    new JwtAuthResponse(token, userResponse)));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
@@ -51,35 +57,37 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
-            
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            
+
             // Generate JWT token
             String token = tokenProvider.generateToken(authentication);
-            
+
             // Get user details
             User user = userService.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             UserResponse userResponse = UserResponse.fromUser(user);
-            
-            return ResponseEntity.ok(ApiResponse.success("Login successful!", 
-                new JwtAuthResponse(token, userResponse)));
+
+            return ResponseEntity.ok(ApiResponse.success("Login successful!",
+                    new JwtAuthResponse(token, userResponse)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Invalid email or password"));
         }
     }
 
-     @GetMapping("/profile")
+    @GetMapping("/profile")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                 .body(ApiResponse.error("Not logged in"));
+                    .body(ApiResponse.error("Not logged in"));
         }
 
-        String username = authentication.getName();
-        User user = userService.findByUsername(username)
+        // getName() returns the principal identifier we stored in the token during
+        // login/registration,
+        // which in our case is the email address since we authenticate using email
+        String email = authentication.getName();
+        User user = userService.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         UserResponse userResponse = UserResponse.fromUser(user);

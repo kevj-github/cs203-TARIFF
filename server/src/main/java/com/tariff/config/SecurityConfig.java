@@ -23,7 +23,6 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -44,9 +43,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5173",  // Vite dev server
-            "http://localhost:3000",  // Alternative dev port
-            "http://localhost:8080"   // Production URL
+                "http://localhost:5173", // Vite dev server
+                "http://localhost:3000", // Alternative dev port
+                "http://localhost:8080" // Production URL
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
@@ -61,24 +60,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll() // Auth endpoints
-                .requestMatchers("/api/public/**").permitAll() // Public endpoints
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API docs
-                .requestMatchers("/api/products/**").authenticated() // Public product endpoints
-                .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
-                .requestMatchers("/calculate").authenticated() //Calculator endpoints
-                .anyRequest().authenticated() // All other endpoints require authentication
-            )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .formLogin(form -> form.disable())
-            .httpBasic(basic -> basic.disable())
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()));
+                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll() // Auth endpoints
+                        .requestMatchers("/api/public/**").permitAll() // Public endpoints
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API                                          // docs
+                        .requestMatchers("/api/products/**").authenticated() // Public product endpoints
+                        .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
+                        .requestMatchers("/api/calculate").authenticated() // Calculator endpoints
+                        .anyRequest().authenticated() // All other endpoints require authentication
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
+                .headers(headers -> headers.frameOptions().disable()); // For H2 console
+
         return http.build();
     }
 }

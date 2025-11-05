@@ -1,4 +1,4 @@
-package com.tariff.web.dto;
+package com.tariff.api.dto;
 
 public class LoginRequest {
     private String email;
