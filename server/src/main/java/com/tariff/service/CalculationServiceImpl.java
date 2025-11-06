@@ -5,23 +5,31 @@ import com.tariff.api.dto.CalculationDtos.CalculationResponse;
 import com.tariff.domain.TariffRule;
 import com.tariff.domain.RuleType;
 import com.tariff.domain.RateUnit;
+import com.tariff.repository.CalculationRepository;
+import com.tariff.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.Principal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
 public class CalculationServiceImpl implements CalculationService {
 
     private final TariffRuleService tariffRuleService;
+    private final CalculationRepository calculationRepository;
+    private final UserRepository userRepository;
 
-    public CalculationServiceImpl(TariffRuleService tariffRuleService) {
+    public CalculationServiceImpl(TariffRuleService tariffRuleService, CalculationRepository calculationRepository, UserRepository userRepository) {
         this.tariffRuleService = tariffRuleService;
+        this.calculationRepository = calculationRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public CalculationResponse calculate(CalculationRequest req) {
+    public CalculationResponse calculate(CalculationRequest req, Principal principal, boolean save) {
         TariffRule rule;
 
         // If simulation mode is enabled, create a simulated rule
@@ -66,6 +74,23 @@ public class CalculationServiceImpl implements CalculationService {
         }
 
         baseDuty = baseDuty.setScale(2, RoundingMode.HALF_UP);
+
+        if (save) {
+            User user = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new RuntimeException("User not found"));
+            Calculation calculation = new Calculation();
+            calculation.setHsCode(req.hs);
+            calculation.setOriginIso2(req.origin);
+            calculation.setDestIso2(req.dest);
+            calculation.setQuantity(req.quantity);
+            calculation.setDeclaredValuePerUnit(req.customsValue);
+            calculation.setCalcDate(req.on);
+            calculation.setBaseDutyUsd(baseDuty);
+            calculation.setTotalUsd(customsTotal.add(baseDuty));
+            calculation.setRuleApplied(rule.getType().getDbValue());
+            calculation.setCalculatedAt(OffsetDateTime.now());
+            calculation.setUser(user);
+            calculationRepository.save(calculation);
+        }
 
         CalculationResponse resp = new CalculationResponse();
         resp.baseDuty = baseDuty;
