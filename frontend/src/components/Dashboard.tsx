@@ -48,19 +48,19 @@ import { useNavigate } from "react-router-dom";
 
 interface Product {
   id: number;
-  hs_code: string;
+  hsCode: string;
   name: string;
-  product_type: string;
+  productType: string;
 }
 
 interface TariffRule {
   id: number;
-  origin_iso2: string;
-  dest_iso2: string;
-  hs_code: string;
-  rate_value: number;
-  valid_from: string;
-  valid_to?: string;
+  originIso2: string;
+  destIso2: string;
+  hsCode: string;
+  rateValue: number;
+  validFrom: string;
+  validTo?: string;
 }
 
 interface Country {
@@ -69,10 +69,10 @@ interface Country {
   name: string;
 }
 
-interface Country {
-  id: number;
-  iso2: string;
-  name: string;
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
 }
 
 // Sample countries data (you can replace this with actual API data)
@@ -95,22 +95,72 @@ export default function Dashboard() {
   const [selectedDest, setSelectedDest] = useState<string>("all");
 
   // Fetch initial data
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setIsLoading(true);
+  //     setError(null);
+  //     try {
+  //       // Fetch with a reasonable page size for the dashboard
+  //       const [productsData, rulesData] = await Promise.all([
+  //         api.get<Product[]>("/products"),
+  //         api.get<any>("/tariff-rules?page=0&size=50"),
+  //       ]);
+
+  //       setProducts(productsData || []);
+  //       setTariffRules((rulesData?.items as TariffRule[]) || []);
+  //     } catch (err) {
+  //       console.error("Failed to load dashboard data:", err);
+  //       setError(String(err));
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  //   useEffect(() => {
+  //   const fetchData = async () => {
+  //     setIsLoading(true);
+  //     setError(null);
+  //     try {
+  //       const [productsRes, rulesRes] = await Promise.all([
+  //         api.get("/products"),
+  //         api.get("/tariff-rules?page=0&size=50"),
+  //       ]);
+
+  //       setProducts(productsRes.data.data || []);
+  //       setTariffRules(rulesRes.data.data || []);
+  //     } catch (err) {
+  //       console.error("Failed to load dashboard data:", err);
+  //       setError(String(err));
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        // Fetch with a reasonable page size for the dashboard
-        const [productsData, rulesData] = await Promise.all([
+        // Fetch both product and tariff rule data
+        const [productsData, tariffData] = await Promise.all([
           api.get<Product[]>("/products"),
-          api.get<any>("/tariff-rules?page=0&size=50"),
+          api.get<TariffRule[]>("/tariff-rules?page=0&size=50"),
         ]);
 
         setProducts(productsData || []);
-        setTariffRules((rulesData?.items as TariffRule[]) || []);
-      } catch (err) {
-        console.error("Failed to load dashboard data:", err);
-        setError(String(err));
+        setTariffRules(tariffData || []);
+
+        console.log("✅ Products:", productsData);
+        console.log("✅ Tariff rules:", tariffData);
+      } catch (err: any) {
+        console.error("❌ Failed to load dashboard data:", err);
+        setError(err.message || String(err));
       } finally {
         setIsLoading(false);
       }
@@ -119,47 +169,100 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  const [countries, setCountries] = useState<Country[]>([]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setIsLoading(true);
+  //     setError(null);
+  //     try {
+  //       const [productsRes, rulesRes] = await Promise.all([
+  //         api.get<Product[]>("/products"),
+  //         api.get<TariffRule[]>("/tariff-rules?page=0&size=50"),
+  //       ]);
+
+  //       setProducts(productsRes || []);
+  //       setTariffRules(rulesRes || []);
+
+  //       console.log(productsRes.data);
+  //     } catch (err) {
+  //       console.error("Failed to load dashboard data:", err);
+  //       setError(String(err));
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setIsLoading(true);
+  //     setError(null);
+  //     try {
+  //       // const [productsRes, rulesRes, countriesRes] = await Promise.all([
+  //       const [productsRes, rulesRes] = await Promise.all([
+  //         api.get<ApiResponse<Product[]>>("/products"),
+  //         api.get<ApiResponse<TariffRule[]>>("/tariff-rules?page=0&size=50"),
+  //         // api.get<ApiResponse<Country[]>>("/countries"),
+  //       ]);
+
+  //       setProducts(productsRes.data.data || []);
+  //       setTariffRules(rulesRes.data.data || []);
+  //       // setCountries(countriesRes.data.data || []);
+  //     } catch (err) {
+  //       console.error("Failed to load dashboard data:", err);
+  //       setError(String(err));
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   // Calculate statistics for cards
   const stats = {
     totalProducts: products.length,
     activeRules: tariffRules.length,
     avgRate: tariffRules.length
       ? (
-          tariffRules.reduce((sum, rule) => sum + rule.rate_value, 0) /
+          tariffRules.reduce((sum, rule) => sum + rule.rateValue, 0) /
           tariffRules.length
         ).toFixed(1)
       : "0.0",
     maxRate: tariffRules.length
-      ? Math.max(...tariffRules.map((rule) => rule.rate_value))
+      ? Math.max(...tariffRules.map((rule) => rule.rateValue))
       : 0,
   };
 
   // Prepare chart data
   const productTypeData = products.reduce((acc: any[], product) => {
-    const existingType = acc.find((p) => p.type === product.product_type);
+    const existingType = acc.find((p) => p.type === product.productType);
     if (existingType) {
       existingType.count++;
     } else {
-      acc.push({ type: product.product_type, count: 1 });
+      acc.push({ type: product.productType, count: 1 });
     }
     return acc;
   }, []);
 
   const ratesByCountryData = tariffRules.reduce((acc: any[], rule) => {
-    const key = `${rule.origin_iso2}-${rule.dest_iso2}`;
+    const key = `${rule.originIso2}-${rule.destIso2}`;
     const existing = acc.find((item) => item.pair === key);
     if (existing) {
       existing.count++;
       existing.avgRate =
-        (existing.avgRate * (existing.count - 1) + rule.rate_value) /
+        (existing.avgRate * (existing.count - 1) + rule.rateValue) /
         existing.count;
     } else {
       acc.push({
         pair: key,
         count: 1,
-        avgRate: rule.rate_value,
-        from: rule.origin_iso2,
-        to: rule.dest_iso2,
+        avgRate: rule.rateValue,
+        from: rule.originIso2,
+        to: rule.destIso2,
       });
     }
     return acc;

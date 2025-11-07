@@ -39,11 +39,11 @@ const items = [
     url: "/calculator",
     icon: Calculator,
   },
-  {
-    title: "Search",
-    url: "/search",
-    icon: Search,
-  },
+  // {
+  //   title: "Search",
+  //   url: "/search",
+  //   icon: Search,
+  // },
   {
     title: "Profile",
     url: "/profile",
