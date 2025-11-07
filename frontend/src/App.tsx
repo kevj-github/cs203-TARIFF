@@ -12,6 +12,7 @@ import "react-day-picker/style.css";
 import { ProtectedRoute } from "./components/protected-route";
 import TariffDashboard from "./components/TariffDashboard";
 import CalculatorPage from "./components/CalculatorPage";
+import Dashboard from "./components/Dashboard";
 
 function App() {
   return (
@@ -22,7 +23,8 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/home" element={<TariffDashboard />} />
+          <Route path="/home" element={<Dashboard />} />
+          <Route path="/search" element={<TariffDashboard />} />
           <Route path="/product" element={<ProductsPage />} />
           <Route path="/calculator" element={<CalculatorPage />} />
           <Route path="/profile" element={<ProfilePage />} />
