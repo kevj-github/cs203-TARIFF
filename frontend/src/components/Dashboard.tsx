@@ -89,13 +89,176 @@ export default function Dashboard() {
   const [tariffRules, setTariffRules] = useState<TariffRule[]>([]);
   const [selectedOrigin, setSelectedOrigin] = useState<string>("all");
   const [selectedDest, setSelectedDest] = useState<string>("all");
-
+  const [selectedHS, setSelectedHS] = useState<string>("all");
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
 
   const addDebug = (msg: string) => {
     console.log("🔍 DEBUG:", msg);
     setDebugInfo((prev) => [...prev, msg]);
   };
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setIsLoading(true);
+  //     setError(null);
+  //     setDebugInfo([]);
+
+  //     try {
+  //       addDebug("Starting data fetch...");
+  //       const today = new Date().toISOString().split("T")[0];
+  //       addDebug(`Using date: ${today}`);
+
+  //       // Test products endpoint
+  //       // addDebug("Fetching products from /api/products");
+  //       // const productsRes = await api.get("/products");
+  //       // addDebug(
+  //       //   `Products response received: ${JSON.stringify(productsRes).substring(
+  //       //     0,
+  //       //     200
+  //       //   )}`
+  //       // );
+
+  //       // Test tariff rules endpoint
+  //       // addDebug(`Fetching tariff rules from /api/tariff-rules?on=${today}`);
+  //       // const tariffRes = await api.get(`/tariff-rules?on=${today}`);
+  //       // addDebug(
+  //       //   `Tariff response received: ${JSON.stringify(tariffRes).substring(
+  //       //     0,
+  //       //     200
+  //       //   )}`
+  //       // );
+
+  //       let url = `/tariff-rules?on=${today}`;
+  //       if (selectedOrigin !== "all") url += `&origin=${selectedOrigin}`;
+  //       if (selectedDest !== "all") url += `&dest=${selectedDest}`;
+  //       if (selectedHS && selectedHS !== "all") url += `&hs=${selectedHS}`;
+
+  //       addDebug(`Fetching tariff rules from ${url}`);
+  //       const [productsRes, tariffRes] = await Promise.all([
+  //         api.get("/products"),
+  //         api.get(url),
+  //       ]);
+
+  //       // Try different data extraction methods
+  //       let productsData: Product[] = [];
+  //       let tariffData: TariffRule[] = [];
+
+  //       // Method 1: Check if response has .data.data (ApiResponse wrapper)
+  //       if (productsRes?.data?.data) {
+  //         productsData = productsRes.data.data;
+  //         addDebug(
+  //           `✅ Products extracted via .data.data: ${productsData.length} items`
+  //         );
+  //       }
+  //       // Method 2: Check if response.data is the array directly
+  //       else if (Array.isArray(productsRes?.data)) {
+  //         productsData = productsRes.data;
+  //         addDebug(
+  //           `✅ Products extracted via .data: ${productsData.length} items`
+  //         );
+  //       }
+  //       // Method 3: Check if response is the array directly
+  //       else if (Array.isArray(productsRes)) {
+  //         productsData = productsRes;
+  //         addDebug(
+  //           `✅ Products extracted directly: ${productsData.length} items`
+  //         );
+  //       } else {
+  //         addDebug(
+  //           `❌ Could not extract products. Response type: ${typeof productsRes}`
+  //         );
+  //       }
+
+  //       // Same for tariff rules
+  //       if (tariffRes?.data?.data) {
+  //         tariffData = tariffRes.data.data;
+  //         addDebug(
+  //           `✅ Tariff rules extracted via .data.data: ${tariffData.length} items`
+  //         );
+  //       } else if (Array.isArray(tariffRes?.data)) {
+  //         tariffData = tariffRes.data;
+  //         addDebug(
+  //           `✅ Tariff rules extracted via .data: ${tariffData.length} items`
+  //         );
+  //       } else if (Array.isArray(tariffRes)) {
+  //         tariffData = tariffRes;
+  //         addDebug(
+  //           `✅ Tariff rules extracted directly: ${tariffData.length} items`
+  //         );
+  //       } else {
+  //         addDebug(
+  //           `❌ Could not extract tariff rules. Response type: ${typeof tariffRes}`
+  //         );
+  //       }
+
+  //       setProducts(productsData);
+  //       setTariffRules(tariffData);
+
+  //       addDebug(
+  //         `✅ Final state - Products: ${productsData.length}, Tariff Rules: ${tariffData.length}`
+  //       );
+  //     } catch (err: any) {
+  //       console.error("❌ Failed to load dashboard data:", err);
+  //       const errorMessage =
+  //         err.response?.data?.message || err.message || String(err);
+  //       addDebug(`❌ ERROR: ${errorMessage}`);
+  //       addDebug(`❌ Error details: ${JSON.stringify(err.response || err)}`);
+  //       setError(errorMessage);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [selectedOrigin, selectedDest, selectedHS]);
+
+  // Put this helper above useEffect
+  function unwrapArray(res: any, label: string, addDebug: (s: string) => void) {
+    if (!res) return [];
+    const d = res.data ?? res;
+
+    // Most common cases first
+    if (Array.isArray(d)) {
+      addDebug(
+        `✅ ${label}: extracted from .data (array) -> ${d.length} items`
+      );
+      return d;
+    }
+    if (Array.isArray(d?.data)) {
+      addDebug(
+        `✅ ${label}: extracted from .data.data -> ${d.data.length} items`
+      );
+      return d.data;
+    }
+
+    // Other likely wrappers (pagination, etc.)
+    if (Array.isArray(d?.items)) {
+      addDebug(
+        `✅ ${label}: extracted from .data.items -> ${d.items.length} items`
+      );
+      return d.items;
+    }
+    if (Array.isArray(d?.content)) {
+      addDebug(
+        `✅ ${label}: extracted from .data.content -> ${d.content.length} items`
+      );
+      return d.content;
+    }
+
+    // Nothing matched — log the shape to debug
+    addDebug(
+      `❌ ${label}: unknown payload shape. Keys=${Object.keys(d || {}).join(
+        ", "
+      )}`
+    );
+    addDebug(
+      `❌ ${label}: raw payload (trunc): ${JSON.stringify(d).slice(0, 500)}`
+    );
+    return [];
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,81 +267,65 @@ export default function Dashboard() {
       setDebugInfo([]);
 
       try {
-        addDebug("Starting data fetch...");
+        // 🗓 Use selectedDate or today's date by default
         const today = new Date().toISOString().split("T")[0];
-        addDebug(`Using date: ${today}`);
+        const dateParam = selectedDate || today;
 
-        // Test products endpoint
-        addDebug("Fetching products from /api/products");
-        const productsRes = await api.get("/products");
-        addDebug(
-          `Products response received: ${JSON.stringify(productsRes).substring(
-            0,
-            200
-          )}`
+        addDebug("Starting data fetch...");
+        addDebug(`Using date: ${dateParam}`);
+
+        // 🧠 Build request URL dynamically based on filters
+        let url = `/tariff-rules?on=${dateParam}`;
+        if (selectedOrigin !== "all") url += `&origin=${selectedOrigin}`;
+        if (selectedDest !== "all") url += `&dest=${selectedDest}`;
+        if (selectedHS !== "all" && selectedHS) url += `&hs=${selectedHS}`;
+
+        addDebug(`Fetching products from /api/products`);
+        addDebug(`Fetching tariff rules from ${url}`);
+
+        const [productsRes, tariffRes] = await Promise.all([
+          api.get("/products"),
+          api.get(url),
+        ]);
+
+        // ✅ Extract product data
+        // let productsData: Product[] = [];
+        // if (productsRes?.data?.data) {
+        //   productsData = productsRes.data.data;
+        //   addDebug(
+        //     `✅ Products extracted via .data.data: ${productsData.length} items`
+        //   );
+        // } else if (Array.isArray(productsRes?.data)) {
+        //   productsData = productsRes.data;
+        //   addDebug(
+        //     `✅ Products extracted via .data: ${productsData.length} items`
+        //   );
+        // }
+
+        // ✅ Extract tariff data
+        // let tariffData: TariffRule[] = [];
+        // if (tariffRes?.data?.data) {
+        //   tariffData = tariffRes.data.data;
+        //   addDebug(
+        //     `✅ Tariff rules extracted via .data.data: ${tariffData.length} items`
+        //   );
+        // } else if (Array.isArray(tariffRes?.data)) {
+        //   tariffData = tariffRes.data;
+        //   addDebug(
+        //     `✅ Tariff rules extracted via .data: ${tariffData.length} items`
+        //   );
+        // }
+
+        const productsData: Product[] = unwrapArray(
+          productsRes,
+          "Products",
+          addDebug
         );
-
-        // Test tariff rules endpoint
-        addDebug(`Fetching tariff rules from /api/tariff-rules?on=${today}`);
-        const tariffRes = await api.get(`/tariff-rules?on=${today}`);
-        addDebug(
-          `Tariff response received: ${JSON.stringify(tariffRes).substring(
-            0,
-            200
-          )}`
+        const tariffData: TariffRule[] = unwrapArray(
+          tariffRes,
+          "Tariff rules",
+          addDebug
         );
-
-        // Try different data extraction methods
-        let productsData: Product[] = [];
-        let tariffData: TariffRule[] = [];
-
-        // Method 1: Check if response has .data.data (ApiResponse wrapper)
-        if (productsRes?.data?.data) {
-          productsData = productsRes.data.data;
-          addDebug(
-            `✅ Products extracted via .data.data: ${productsData.length} items`
-          );
-        }
-        // Method 2: Check if response.data is the array directly
-        else if (Array.isArray(productsRes?.data)) {
-          productsData = productsRes.data;
-          addDebug(
-            `✅ Products extracted via .data: ${productsData.length} items`
-          );
-        }
-        // Method 3: Check if response is the array directly
-        else if (Array.isArray(productsRes)) {
-          productsData = productsRes;
-          addDebug(
-            `✅ Products extracted directly: ${productsData.length} items`
-          );
-        } else {
-          addDebug(
-            `❌ Could not extract products. Response type: ${typeof productsRes}`
-          );
-        }
-
-        // Same for tariff rules
-        if (tariffRes?.data?.data) {
-          tariffData = tariffRes.data.data;
-          addDebug(
-            `✅ Tariff rules extracted via .data.data: ${tariffData.length} items`
-          );
-        } else if (Array.isArray(tariffRes?.data)) {
-          tariffData = tariffRes.data;
-          addDebug(
-            `✅ Tariff rules extracted via .data: ${tariffData.length} items`
-          );
-        } else if (Array.isArray(tariffRes)) {
-          tariffData = tariffRes;
-          addDebug(
-            `✅ Tariff rules extracted directly: ${tariffData.length} items`
-          );
-        } else {
-          addDebug(
-            `❌ Could not extract tariff rules. Response type: ${typeof tariffRes}`
-          );
-        }
 
         setProducts(productsData);
         setTariffRules(tariffData);
@@ -199,43 +346,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
-  // FIXED: Properly handle ApiResponse wrapper and add date parameter
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
-  //     setError(null);
-  //     try {
-  //       // Get current date in ISO format (YYYY-MM-DD)
-  //       const today = new Date().toISOString().split("T")[0];
-
-  //       const [productsRes, tariffRes] = await Promise.all([
-  //         api.get<ApiResponse<Product[]>>("/products"),
-  //         // FIXED: Added 'on' parameter with today's date
-  //         api.get<ApiResponse<TariffRule[]>>(`/tariff-rules?on=${today}`),
-  //       ]);
-
-  //       // FIXED: Extract data from ApiResponse wrapper
-  //       const productsData = productsRes?.data?.data || [];
-  //       const tariffData = tariffRes?.data?.data || [];
-
-  //       setProducts(productsData);
-  //       setTariffRules(tariffData);
-
-  //       console.log("✅ Products loaded:", productsData.length);
-  //       console.log("✅ Tariff rules loaded:", tariffData.length);
-  //     } catch (err: any) {
-  //       console.error("❌ Failed to load dashboard data:", err);
-  //       const errorMessage =
-  //         err.response?.data?.message || err.message || String(err);
-  //       setError(errorMessage);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+  }, [selectedOrigin, selectedDest, selectedHS, selectedDate]);
 
   // Calculate statistics for cards
   const stats = {
@@ -408,6 +519,17 @@ export default function Dashboard() {
     </Card>
   );
 
+  // Group products by productType
+  const groupedProducts = products.reduce(
+    (groups: Record<string, Product[]>, product) => {
+      const type = product.productType || "Other";
+      if (!groups[type]) groups[type] = [];
+      groups[type].push(product);
+      return groups;
+    },
+    {}
+  );
+
   if (error) {
     return (
       <div className="p-6">
@@ -450,6 +572,7 @@ export default function Dashboard() {
               </p>
             </div>
 
+            {/* Origin */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
               <div className="flex-1 min-w-[180px]">
                 {isLoading ? (
@@ -481,6 +604,7 @@ export default function Dashboard() {
                 )}
               </div>
 
+              {/* Destination */}
               <div className="flex-1 min-w-[180px]">
                 {isLoading ? (
                   <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
@@ -509,6 +633,66 @@ export default function Dashboard() {
                     </SelectContent>
                   </Select>
                 )}
+              </div>
+
+              {/* HS Code Filter */}
+              <div className="flex-1 min-w-[180px]">
+                {isLoading ? (
+                  <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
+                ) : (
+                  <Select
+                    value={selectedHS || "all"}
+                    onValueChange={(v) => setSelectedHS(v)}
+                  >
+                    <SelectTrigger className="w-full h-9">
+                      {selectedHS && selectedHS !== "all"
+                        ? products.find((p) => p.hsCode === selectedHS)?.name
+                        : "All Products"}
+                    </SelectTrigger>
+
+                    <SelectContent className="bg-white max-h-[320px] overflow-y-auto">
+                      {/* 🟢 Default 'All Products' option */}
+                      <SelectGroup>
+                        <SelectItem
+                          value="all"
+                          className="font-semibold text-gray-600 hover:bg-indigo-50"
+                        >
+                          All Products
+                        </SelectItem>
+                      </SelectGroup>
+
+                      {/* 🟣 Dynamically grouped product categories */}
+                      {Object.entries(groupedProducts).map(
+                        ([category, items]) => (
+                          <SelectGroup key={category}>
+                            <SelectLabel>{category}</SelectLabel>
+                            {items
+                              .sort((a, b) => a.name.localeCompare(b.name))
+                              .map((item) => (
+                                <SelectItem
+                                  key={item.id}
+                                  value={item.hsCode}
+                                  className="font-bold cursor-pointer hover:bg-indigo-100"
+                                >
+                                  {item.name}
+                                </SelectItem>
+                              ))}
+                          </SelectGroup>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
+              {/* Date Filter */}
+              <div className="flex-1 min-w-[180px]">
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
               </div>
             </div>
           </div>
