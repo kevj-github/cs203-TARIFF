@@ -37,8 +37,15 @@ import {
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { Label } from "./ui/label";
+import { Calendar } from "./ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { CalendarIcon, FilterIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
+import { DashboardFilters } from "./DashboardFilters";
 
 interface Product {
   id: number;
@@ -571,130 +578,6 @@ export default function Dashboard() {
                 Trade Agreements Regulating Imports and Foreign Fees
               </p>
             </div>
-
-            {/* Origin */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-              <div className="flex-1 min-w-[180px]">
-                {isLoading ? (
-                  <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
-                ) : (
-                  <Select
-                    value={selectedOrigin || "all"}
-                    onValueChange={(v) => setSelectedOrigin(v)}
-                  >
-                    <SelectTrigger className="w-full h-9">
-                      <SelectValue placeholder="Select origin" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectGroup>
-                        <SelectLabel>Origins</SelectLabel>
-                        <SelectItem value="all">All Origins</SelectItem>
-                        {countries.map((country) => (
-                          <SelectItem
-                            key={country.iso2}
-                            value={country.iso2}
-                            className="font-bold cursor-pointer hover:bg-indigo-100"
-                          >
-                            {country.name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              {/* Destination */}
-              <div className="flex-1 min-w-[180px]">
-                {isLoading ? (
-                  <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
-                ) : (
-                  <Select
-                    value={selectedDest || "all"}
-                    onValueChange={(v) => setSelectedDest(v)}
-                  >
-                    <SelectTrigger className="w-full h-9">
-                      <SelectValue placeholder="Select destination" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectGroup>
-                        <SelectLabel>Destinations</SelectLabel>
-                        <SelectItem value="all">All Destinations</SelectItem>
-                        {countries.map((country) => (
-                          <SelectItem
-                            key={country.iso2}
-                            value={country.iso2}
-                            className="font-bold cursor-pointer hover:bg-indigo-100"
-                          >
-                            {country.name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              {/* HS Code Filter */}
-              <div className="flex-1 min-w-[180px]">
-                {isLoading ? (
-                  <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
-                ) : (
-                  <Select
-                    value={selectedHS || "all"}
-                    onValueChange={(v) => setSelectedHS(v)}
-                  >
-                    <SelectTrigger className="w-full h-9">
-                      {selectedHS && selectedHS !== "all"
-                        ? products.find((p) => p.hsCode === selectedHS)?.name
-                        : "All Products"}
-                    </SelectTrigger>
-
-                    <SelectContent className="bg-white max-h-[320px] overflow-y-auto">
-                      {/* 🟢 Default 'All Products' option */}
-                      <SelectGroup>
-                        <SelectItem
-                          value="all"
-                          className="font-semibold text-gray-600 hover:bg-indigo-50"
-                        >
-                          All Products
-                        </SelectItem>
-                      </SelectGroup>
-
-                      {/* 🟣 Dynamically grouped product categories */}
-                      {Object.entries(groupedProducts).map(
-                        ([category, items]) => (
-                          <SelectGroup key={category}>
-                            <SelectLabel>{category}</SelectLabel>
-                            {items
-                              .sort((a, b) => a.name.localeCompare(b.name))
-                              .map((item) => (
-                                <SelectItem
-                                  key={item.id}
-                                  value={item.hsCode}
-                                  className="font-bold cursor-pointer hover:bg-indigo-100"
-                                >
-                                  {item.name}
-                                </SelectItem>
-                              ))}
-                          </SelectGroup>
-                        )
-                      )}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              {/* Date Filter */}
-              <div className="flex-1 min-w-[180px]">
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                />
-              </div>
-            </div>
           </div>
         </div>
       </header>
@@ -745,6 +628,120 @@ export default function Dashboard() {
           )}
         </div>
 
+        <div className="grid gap-6 md:grid-cols-2">
+          {isLoading ? (
+            <>
+              <SkeletonChart />
+              <SkeletonChart />
+            </>
+          ) : (
+            <>
+              <Card className="p-6 hover:shadow-md transition-all duration-200 border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                  Product Distribution
+                </h3>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={productTypeData}
+                        dataKey="count"
+                        nameKey="type"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={2}
+                        labelLine={true}
+                        label={({ type, count, percent }) =>
+                          `${type} (${count}, ${(percent * 100).toFixed(0)}%)`
+                        }
+                      >
+                        {productTypeData.map((entry, index) => (
+                          <Cell
+                            key={entry.type}
+                            fill={COLORS[index % COLORS.length]}
+                            strokeWidth={1}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value: number) => [
+                          `${value} Products`,
+                          "Count",
+                        ]}
+                        contentStyle={{
+                          borderRadius: "8px",
+                          backgroundColor: "rgba(255, 255, 255, 0.95)",
+                          border: "1px solid #e2e8f0",
+                          padding: "8px 12px",
+                        }}
+                        wrapperStyle={{ outline: "none" }}
+                      />
+                      {/* <Legend
+                        layout="horizontal"
+                        verticalAlign="bottom"
+                        align="center"
+                        formatter={(value) => (
+                          <span className="text-sm text-gray-600">{value}</span>
+                        )}
+                      /> */}
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+
+              <Card className="p-6 hover:shadow-md transition-all duration-200 border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                  Average Rates by Route
+                </h3>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={ratesByCountryData} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" />
+                      <YAxis
+                        dataKey="pair"
+                        type="category"
+                        width={80}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <Tooltip
+                        formatter={(value) => [
+                          `${Number(value).toFixed(1)}%`,
+                          "Rate",
+                        ]}
+                        contentStyle={{ borderRadius: "8px" }}
+                      />
+                      <Bar
+                        dataKey="avgRate"
+                        fill="#8b5cf6"
+                        name="Average Rate"
+                        radius={[0, 4, 4, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+            </>
+          )}
+        </div>
+
+        <DashboardFilters
+          isLoading={isLoading}
+          countries={countries}
+          products={products}
+          groupedProducts={groupedProducts}
+          selectedOrigin={selectedOrigin}
+          selectedDest={selectedDest}
+          selectedHS={selectedHS}
+          selectedDate={selectedDate}
+          onOriginChange={setSelectedOrigin}
+          onDestChange={setSelectedDest}
+          onHSChange={setSelectedHS}
+          onDateChange={setSelectedDate}
+        />
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {isLoading ? (
             <>
@@ -783,88 +780,6 @@ export default function Dashboard() {
                 trend="up"
                 change="CN → US route"
               />
-            </>
-          )}
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          {isLoading ? (
-            <>
-              <SkeletonChart />
-              <SkeletonChart />
-            </>
-          ) : (
-            <>
-              <Card className="p-6 hover:shadow-md transition-all duration-200 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Product Distribution
-                </h3>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={productTypeData}
-                        dataKey="count"
-                        nameKey="type"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        labelLine={false}
-                        label={({ type }) => type as string}
-                      >
-                        {productTypeData.map((entry, index) => (
-                          <Cell
-                            key={entry.type}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value: number) => [value, "Products"]}
-                        contentStyle={{ borderRadius: "8px" }}
-                      />
-                      <Legend
-                        formatter={(value) => (
-                          <span className="text-sm">{value}</span>
-                        )}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </Card>
-
-              <Card className="p-6 hover:shadow-md transition-all duration-200 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Average Rates by Route
-                </h3>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={ratesByCountryData} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis
-                        dataKey="pair"
-                        type="category"
-                        width={80}
-                        tick={{ fontSize: 12 }}
-                      />
-                      <Tooltip
-                        formatter={(value) => [
-                          `${Number(value).toFixed(1)}%`,
-                          "Rate",
-                        ]}
-                        contentStyle={{ borderRadius: "8px" }}
-                      />
-                      <Bar
-                        dataKey="avgRate"
-                        fill="#8b5cf6"
-                        name="Average Rate"
-                        radius={[0, 4, 4, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </Card>
             </>
           )}
         </div>
