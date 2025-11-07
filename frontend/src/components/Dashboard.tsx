@@ -8,8 +8,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -17,16 +15,13 @@ import {
 import {
   TrendingUp,
   TrendingDown,
-  Globe,
   Package,
-  DollarSign,
   Calculator,
   Search,
   LineChart as LineChartIcon,
   ArrowUpRight,
   ArrowDownRight,
   Flag,
-  Boxes,
 } from "lucide-react";
 
 import {
@@ -41,7 +36,6 @@ import {
 
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Skeleton } from "./ui/skeleton";
 import { api } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
@@ -55,10 +49,12 @@ interface Product {
 
 interface TariffRule {
   id: number;
-  originIso2: string;
-  destIso2: string;
-  hsCode: string;
-  rateValue: number;
+  origin: string;
+  dest: string;
+  hs: string;
+  type: string;
+  rate: number;
+  unit: string;
   validFrom: string;
   validTo?: string;
 }
@@ -69,13 +65,13 @@ interface Country {
   name: string;
 }
 
+// FIXED: Added proper ApiResponse interface
 interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
 }
 
-// Sample countries data (you can replace this with actual API data)
 const countries: Country[] = [
   { id: 1, iso2: "SG", name: "Singapore" },
   { id: 2, iso2: "US", name: "United States" },
@@ -94,73 +90,109 @@ export default function Dashboard() {
   const [selectedOrigin, setSelectedOrigin] = useState<string>("all");
   const [selectedDest, setSelectedDest] = useState<string>("all");
 
-  // Fetch initial data
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
-  //     setError(null);
-  //     try {
-  //       // Fetch with a reasonable page size for the dashboard
-  //       const [productsData, rulesData] = await Promise.all([
-  //         api.get<Product[]>("/products"),
-  //         api.get<any>("/tariff-rules?page=0&size=50"),
-  //       ]);
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
 
-  //       setProducts(productsData || []);
-  //       setTariffRules((rulesData?.items as TariffRule[]) || []);
-  //     } catch (err) {
-  //       console.error("Failed to load dashboard data:", err);
-  //       setError(String(err));
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
-  //   useEffect(() => {
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
-  //     setError(null);
-  //     try {
-  //       const [productsRes, rulesRes] = await Promise.all([
-  //         api.get("/products"),
-  //         api.get("/tariff-rules?page=0&size=50"),
-  //       ]);
-
-  //       setProducts(productsRes.data.data || []);
-  //       setTariffRules(rulesRes.data.data || []);
-  //     } catch (err) {
-  //       console.error("Failed to load dashboard data:", err);
-  //       setError(String(err));
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+  const addDebug = (msg: string) => {
+    console.log("🔍 DEBUG:", msg);
+    setDebugInfo((prev) => [...prev, msg]);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
+      setDebugInfo([]);
+
       try {
-        // Fetch both product and tariff rule data
-        const [productsData, tariffData] = await Promise.all([
-          api.get<Product[]>("/products"),
-          api.get<TariffRule[]>("/tariff-rules?page=0&size=50"),
-        ]);
+        addDebug("Starting data fetch...");
+        const today = new Date().toISOString().split("T")[0];
+        addDebug(`Using date: ${today}`);
 
-        setProducts(productsData || []);
-        setTariffRules(tariffData || []);
+        // Test products endpoint
+        addDebug("Fetching products from /api/products");
+        const productsRes = await api.get("/products");
+        addDebug(
+          `Products response received: ${JSON.stringify(productsRes).substring(
+            0,
+            200
+          )}`
+        );
 
-        console.log("✅ Products:", productsData);
-        console.log("✅ Tariff rules:", tariffData);
+        // Test tariff rules endpoint
+        addDebug(`Fetching tariff rules from /api/tariff-rules?on=${today}`);
+        const tariffRes = await api.get(`/tariff-rules?on=${today}`);
+        addDebug(
+          `Tariff response received: ${JSON.stringify(tariffRes).substring(
+            0,
+            200
+          )}`
+        );
+
+        // Try different data extraction methods
+        let productsData: Product[] = [];
+        let tariffData: TariffRule[] = [];
+
+        // Method 1: Check if response has .data.data (ApiResponse wrapper)
+        if (productsRes?.data?.data) {
+          productsData = productsRes.data.data;
+          addDebug(
+            `✅ Products extracted via .data.data: ${productsData.length} items`
+          );
+        }
+        // Method 2: Check if response.data is the array directly
+        else if (Array.isArray(productsRes?.data)) {
+          productsData = productsRes.data;
+          addDebug(
+            `✅ Products extracted via .data: ${productsData.length} items`
+          );
+        }
+        // Method 3: Check if response is the array directly
+        else if (Array.isArray(productsRes)) {
+          productsData = productsRes;
+          addDebug(
+            `✅ Products extracted directly: ${productsData.length} items`
+          );
+        } else {
+          addDebug(
+            `❌ Could not extract products. Response type: ${typeof productsRes}`
+          );
+        }
+
+        // Same for tariff rules
+        if (tariffRes?.data?.data) {
+          tariffData = tariffRes.data.data;
+          addDebug(
+            `✅ Tariff rules extracted via .data.data: ${tariffData.length} items`
+          );
+        } else if (Array.isArray(tariffRes?.data)) {
+          tariffData = tariffRes.data;
+          addDebug(
+            `✅ Tariff rules extracted via .data: ${tariffData.length} items`
+          );
+        } else if (Array.isArray(tariffRes)) {
+          tariffData = tariffRes;
+          addDebug(
+            `✅ Tariff rules extracted directly: ${tariffData.length} items`
+          );
+        } else {
+          addDebug(
+            `❌ Could not extract tariff rules. Response type: ${typeof tariffRes}`
+          );
+        }
+
+        setProducts(productsData);
+        setTariffRules(tariffData);
+
+        addDebug(
+          `✅ Final state - Products: ${productsData.length}, Tariff Rules: ${tariffData.length}`
+        );
       } catch (err: any) {
         console.error("❌ Failed to load dashboard data:", err);
-        setError(err.message || String(err));
+        const errorMessage =
+          err.response?.data?.message || err.message || String(err);
+        addDebug(`❌ ERROR: ${errorMessage}`);
+        addDebug(`❌ Error details: ${JSON.stringify(err.response || err)}`);
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -168,52 +200,35 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
-
-  const [countries, setCountries] = useState<Country[]>([]);
-
+  // FIXED: Properly handle ApiResponse wrapper and add date parameter
   // useEffect(() => {
   //   const fetchData = async () => {
   //     setIsLoading(true);
   //     setError(null);
   //     try {
-  //       const [productsRes, rulesRes] = await Promise.all([
-  //         api.get<Product[]>("/products"),
-  //         api.get<TariffRule[]>("/tariff-rules?page=0&size=50"),
-  //       ]);
+  //       // Get current date in ISO format (YYYY-MM-DD)
+  //       const today = new Date().toISOString().split("T")[0];
 
-  //       setProducts(productsRes || []);
-  //       setTariffRules(rulesRes || []);
-
-  //       console.log(productsRes.data);
-  //     } catch (err) {
-  //       console.error("Failed to load dashboard data:", err);
-  //       setError(String(err));
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
-  //     setError(null);
-  //     try {
-  //       // const [productsRes, rulesRes, countriesRes] = await Promise.all([
-  //       const [productsRes, rulesRes] = await Promise.all([
+  //       const [productsRes, tariffRes] = await Promise.all([
   //         api.get<ApiResponse<Product[]>>("/products"),
-  //         api.get<ApiResponse<TariffRule[]>>("/tariff-rules?page=0&size=50"),
-  //         // api.get<ApiResponse<Country[]>>("/countries"),
+  //         // FIXED: Added 'on' parameter with today's date
+  //         api.get<ApiResponse<TariffRule[]>>(`/tariff-rules?on=${today}`),
   //       ]);
 
-  //       setProducts(productsRes.data.data || []);
-  //       setTariffRules(rulesRes.data.data || []);
-  //       // setCountries(countriesRes.data.data || []);
-  //     } catch (err) {
-  //       console.error("Failed to load dashboard data:", err);
-  //       setError(String(err));
+  //       // FIXED: Extract data from ApiResponse wrapper
+  //       const productsData = productsRes?.data?.data || [];
+  //       const tariffData = tariffRes?.data?.data || [];
+
+  //       setProducts(productsData);
+  //       setTariffRules(tariffData);
+
+  //       console.log("✅ Products loaded:", productsData.length);
+  //       console.log("✅ Tariff rules loaded:", tariffData.length);
+  //     } catch (err: any) {
+  //       console.error("❌ Failed to load dashboard data:", err);
+  //       const errorMessage =
+  //         err.response?.data?.message || err.message || String(err);
+  //       setError(errorMessage);
   //     } finally {
   //       setIsLoading(false);
   //     }
@@ -228,12 +243,12 @@ export default function Dashboard() {
     activeRules: tariffRules.length,
     avgRate: tariffRules.length
       ? (
-          tariffRules.reduce((sum, rule) => sum + rule.rateValue, 0) /
+          tariffRules.reduce((sum, rule) => sum + rule.rate, 0) /
           tariffRules.length
         ).toFixed(1)
       : "0.0",
     maxRate: tariffRules.length
-      ? Math.max(...tariffRules.map((rule) => rule.rateValue))
+      ? Math.max(...tariffRules.map((rule) => rule.rate))
       : 0,
   };
 
@@ -249,20 +264,19 @@ export default function Dashboard() {
   }, []);
 
   const ratesByCountryData = tariffRules.reduce((acc: any[], rule) => {
-    const key = `${rule.originIso2}-${rule.destIso2}`;
+    const key = `${rule.origin}-${rule.dest}`;
     const existing = acc.find((item) => item.pair === key);
     if (existing) {
       existing.count++;
       existing.avgRate =
-        (existing.avgRate * (existing.count - 1) + rule.rateValue) /
-        existing.count;
+        (existing.avgRate * (existing.count - 1) + rule.rate) / existing.count;
     } else {
       acc.push({
         pair: key,
         count: 1,
-        avgRate: rule.rateValue,
-        from: rule.originIso2,
-        to: rule.destIso2,
+        avgRate: rule.rate,
+        from: rule.origin,
+        to: rule.dest,
       });
     }
     return acc;
@@ -358,7 +372,7 @@ export default function Dashboard() {
 
   const SkeletonCard = () => (
     <Card className="p-6">
-      <div className="flex items-center justify-between p-6 hover:shadow-md transition-all duration-200 border border-gray-100">
+      <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-4 w-[120px] animate-pulse bg-violet-100" />
           <Skeleton className="h-8 w-[60px] animate-pulse bg-violet-100" />
@@ -408,13 +422,22 @@ export default function Dashboard() {
             Retry
           </Button>
         </div>
+
+        {/* Debug Info Panel */}
+        <div className="bg-gray-50 text-gray-800 p-4 rounded-lg">
+          <h3 className="font-semibold mb-2">🔍 Debug Information:</h3>
+          <div className="text-xs font-mono space-y-1 max-h-96 overflow-y-auto">
+            {debugInfo.map((info, idx) => (
+              <div key={idx}>{info}</div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50/30">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200 mb-6">
         <div className="px-6 py-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between items-center">
@@ -427,47 +450,7 @@ export default function Dashboard() {
               </p>
             </div>
 
-            {/* <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 min-w-[180px]">
-                {isLoading ? (
-                  <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
-                ) : (
-                  <select
-                    className="w-[180px] h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
-                    value={selectedOrigin || "all"}
-                    onChange={(e) => setSelectedOrigin(e.target.value)}
-                  >
-                    <option value="all">All Origins</option>
-                    {countries.map((country) => (
-                      <option key={country.iso2} value={country.iso2}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              <div className="flex items-center space-x-2 min-w-[180px]">
-                {isLoading ? (
-                  <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
-                ) : (
-                  <select
-                    className="w-[180px] h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
-                    value={selectedDest || "all"}
-                    onChange={(e) => setSelectedDest(e.target.value)}
-                  >
-                    <option value="all">All Destinations</option>
-                    {countries.map((country) => (
-                      <option key={country.iso2} value={country.iso2}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            </div> */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-              {/* Origin */}
               <div className="flex-1 min-w-[180px]">
                 {isLoading ? (
                   <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
@@ -476,7 +459,7 @@ export default function Dashboard() {
                     value={selectedOrigin || "all"}
                     onValueChange={(v) => setSelectedOrigin(v)}
                   >
-                    <SelectTrigger className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors">
+                    <SelectTrigger className="w-full h-9">
                       <SelectValue placeholder="Select origin" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -487,7 +470,7 @@ export default function Dashboard() {
                           <SelectItem
                             key={country.iso2}
                             value={country.iso2}
-                            className="font-semibold cursor-pointer hover:bg-indigo-100 focus:bg-indigo-100 focus:text-indigo-900"
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
                           >
                             {country.name}
                           </SelectItem>
@@ -498,7 +481,6 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* Destination */}
               <div className="flex-1 min-w-[180px]">
                 {isLoading ? (
                   <Skeleton className="h-9 w-full animate-pulse bg-violet-100 rounded-md" />
@@ -507,7 +489,7 @@ export default function Dashboard() {
                     value={selectedDest || "all"}
                     onValueChange={(v) => setSelectedDest(v)}
                   >
-                    <SelectTrigger className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors">
+                    <SelectTrigger className="w-full h-9">
                       <SelectValue placeholder="Select destination" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -518,7 +500,7 @@ export default function Dashboard() {
                           <SelectItem
                             key={country.iso2}
                             value={country.iso2}
-                            className="font-semibold cursor-pointer hover:bg-indigo-100 focus:bg-indigo-100 focus:text-indigo-900"
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
                           >
                             {country.name}
                           </SelectItem>
@@ -532,8 +514,22 @@ export default function Dashboard() {
           </div>
         </div>
       </header>
+
+      {/* Debug Panel - Only show if data is 0 */}
+      {!isLoading && (products.length === 0 || tariffRules.length === 0) && (
+        <Card className="p-4 bg-yellow-50 border-yellow-200">
+          <h3 className="font-semibold text-yellow-900 mb-2">
+            ⚠️ Debug Information
+          </h3>
+          <div className="text-xs font-mono text-yellow-800 space-y-1 max-h-48 overflow-y-auto">
+            {debugInfo.map((info, idx) => (
+              <div key={idx}>{info}</div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       <div className="px-6 pb-6 space-y-6">
-        {/* Quick Actions Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {isLoading ? (
             <>
@@ -565,7 +561,6 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Quick Stats Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {isLoading ? (
             <>
@@ -608,9 +603,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Charts Grid */}
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Product Types Distribution */}
           {isLoading ? (
             <>
               <SkeletonChart />
@@ -693,18 +686,12 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-600">
               Data loaded from SQL database
             </p>
-            {/* <p className="text-xs text-gray-500 mt-1">
-              {countries.length} countries, {products.length} products,{" "}
-              {tariffRules.length} tariff rules, {indirectTaxRules.length} tax
-              rules
-            </p> */}
           </div>
           <div className="flex items-center space-x-4">
             <button className="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors">

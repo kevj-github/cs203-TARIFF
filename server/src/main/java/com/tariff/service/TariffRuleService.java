@@ -24,7 +24,7 @@ public class TariffRuleService {
     @Transactional
     public TariffRuleResponse create(CreateTariffRuleRequest req) {
         final String origin = req.origin == null ? null : req.origin.trim().toUpperCase();
-        final String dest   = req.dest   == null ? null : req.dest.trim().toUpperCase();
+        final String dest = req.dest == null ? null : req.dest.trim().toUpperCase();
 
         // Parse enums from DTO strings (validations already run at DTO layer)
         final RuleType type = parseRuleType(req.type);
@@ -49,13 +49,27 @@ public class TariffRuleService {
 
     @Transactional(readOnly = true)
     public List<TariffRule> findApplicable(String origin, String dest, String hs, LocalDate onDate) {
+        // Default to today if null
+        LocalDate effectiveDate = (onDate != null) ? onDate : LocalDate.now();
+
         return repo.findApplicable(
                 origin == null ? null : origin.toUpperCase(),
-                dest   == null ? null : dest.toUpperCase(),
+                dest == null ? null : dest.toUpperCase(),
                 hs,
-                onDate
+                effectiveDate // Now guaranteed to be non-null
         );
     }
+
+    // @Transactional(readOnly = true)
+    // public List<TariffRule> findApplicable(String origin, String dest, String hs,
+    // LocalDate onDate) {
+    // return repo.findApplicable(
+    // origin == null ? null : origin.toUpperCase(),
+    // dest == null ? null : dest.toUpperCase(),
+    // hs,
+    // onDate
+    // );
+    // }
 
     public static TariffRuleResponse toResp(TariffRule t) {
         TariffRuleResponse r = new TariffRuleResponse();
@@ -63,9 +77,9 @@ public class TariffRuleService {
         r.origin = t.getOriginCountry();
         r.dest = t.getDestCountry();
         r.hs = t.getHsCode();
-        r.type = t.getType().getDbValue();   // "ad_valorem" | "specific" | "compound"
+        r.type = t.getType().getDbValue(); // "ad_valorem" | "specific" | "compound"
         r.rate = t.getRate();
-        r.unit = t.getUnit().getDbValue();   // e.g. "PERCENT", "USD_PER_UNIT", "PERCENT+USD_PER_UNIT"
+        r.unit = t.getUnit().getDbValue(); // e.g. "PERCENT", "USD_PER_UNIT", "PERCENT+USD_PER_UNIT"
         r.validFrom = t.getValidFrom();
         r.validTo = t.getValidTo();
         return r;
@@ -74,21 +88,24 @@ public class TariffRuleService {
     // ---------- helpers ----------
 
     private static RuleType parseRuleType(String s) {
-        if (s == null) throw new IllegalArgumentException("rule type is required");
+        if (s == null)
+            throw new IllegalArgumentException("rule type is required");
         String v = s.trim().toLowerCase();
         return switch (v) {
             case "ad_valorem" -> RuleType.AD_VALOREM;
-            case "specific"   -> RuleType.SPECIFIC;
-            case "compound"   -> RuleType.COMPOUND;
+            case "specific" -> RuleType.SPECIFIC;
+            case "compound" -> RuleType.COMPOUND;
             default -> throw new IllegalArgumentException("Unsupported rule type: " + s);
         };
     }
 
     private static RateUnit parseRateUnit(String s) {
-        if (s == null) throw new IllegalArgumentException("unit is required");
+        if (s == null)
+            throw new IllegalArgumentException("unit is required");
         String v = s.trim().toUpperCase();
         // Allow a few tolerant aliases
-        if ("%".equals(v)) v = "PERCENT";
+        if ("%".equals(v))
+            v = "PERCENT";
         return switch (v) {
             case "PERCENT" -> RateUnit.PERCENT;
             case "USD_PER_UNIT" -> RateUnit.USD_PER_UNIT;
@@ -113,10 +130,10 @@ public class TariffRuleService {
             }
             case COMPOUND -> {
                 if (!(unit == RateUnit.PERCENT_PLUS_USD_PER_UNIT || unit == RateUnit.PERCENT_PLUS_SGD_PER_UNIT)) {
-                    throw new IllegalArgumentException("compound rules must use unit = PERCENT+USD_PER_UNIT or PERCENT+SGD_PER_UNIT");
+                    throw new IllegalArgumentException(
+                            "compound rules must use unit = PERCENT+USD_PER_UNIT or PERCENT+SGD_PER_UNIT");
                 }
             }
         }
     }
 }
-
