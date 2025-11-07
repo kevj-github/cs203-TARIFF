@@ -7,9 +7,9 @@ import {
   Search,
   Settings,
   User2,
+  FileSpreadsheet, // NEW ICON
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
-
 import {
   Sidebar,
   SidebarContent,
@@ -28,7 +28,6 @@ const items = [
     url: "/home",
     icon: Home,
   },
-
   {
     title: "Product",
     url: "/product",
@@ -38,6 +37,11 @@ const items = [
     title: "Calculator",
     url: "/calculator",
     icon: Calculator,
+  },
+  {
+    title: "Bulk Upload", // NEW MENU ITEM
+    url: "/bulk-upload",
+    icon: FileSpreadsheet,
   },
   {
     title: "Search",
@@ -53,7 +57,7 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar variant="inset" collapsible="icon">
+    <Sidebar>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -63,16 +67,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
-                      key={item.title}
                       to={item.url}
-                      //           className={`flex items-center gap-2 p-2 rounded transition-colors
-                      //   ${
-                      //     onmouseenter
-                      //       ? "bg-red-500  text-black"
-                      //       : "text-black hover:bg-red-500 hover:text-white"
-                      //   }
-                      // `}
-
                       className={({ isActive }) =>
                         `flex items-center gap-2 p-2 rounded transition-colors ${
                           isActive
@@ -82,7 +77,7 @@ export function AppSidebar() {
                       }
                     >
                       <item.icon />
-                      {item.title}
+                      <span>{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

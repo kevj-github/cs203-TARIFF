@@ -1,6 +1,7 @@
 import "./App.css";
 
 import { Routes, Route, Navigate } from "react-router-dom";
+import { CsvBulkUpload } from "@/components/CsvBulkUpload";
 // import "./App";
 import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignUp";
@@ -25,6 +26,7 @@ function App() {
           <Route path="/home" element={<TariffDashboard />} />
           <Route path="/product" element={<ProductsPage />} />
           <Route path="/calculator" element={<CalculatorPage />} />
+          <Route path="/bulk-upload" element={<CsvBulkUpload />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
