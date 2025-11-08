@@ -55,4 +55,19 @@ public class ProductController {
         productRepository.deleteById(id);
         return ResponseEntity.ok(ApiResponse.success("Product deleted successfully", null));
     }
+
+    @GetMapping("/exists/{hsCode}")
+    public ResponseEntity<ApiResponse<Boolean>> existsByHsCode(@PathVariable String hsCode) {
+        boolean exists = productRepository.existsByHsCode(hsCode);
+        return ResponseEntity.ok(ApiResponse.success("Exists check", exists));
+    }
+
+    @GetMapping("/by-hs/{hsCode}")
+    public ResponseEntity<ApiResponse<Product>> getProductByHsCode(@PathVariable String hsCode) {
+        Product product = productRepository.findByHsCode(hsCode);
+        if (product == null) {
+            return ResponseEntity.ok(ApiResponse.error("Product not found for HS code: " + hsCode));
+        }
+        return ResponseEntity.ok(ApiResponse.success("Product found", product));
+    }
 }
