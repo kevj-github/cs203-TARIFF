@@ -5,6 +5,8 @@ import com.tariff.api.dto.JwtAuthResponse;
 import com.tariff.api.dto.LoginRequest;
 import com.tariff.api.dto.RegisterRequest;
 import com.tariff.api.dto.UserResponse;
+import com.tariff.api.dto.UpdateProfileRequest;
+import com.tariff.api.dto.ChangePasswordRequest;
 import com.tariff.domain.User;
 import com.tariff.security.JwtTokenProvider;
 import com.tariff.service.UserService;
@@ -92,5 +94,41 @@ public class AuthController {
 
         UserResponse userResponse = UserResponse.fromUser(user);
         return ResponseEntity.ok(ApiResponse.success("Current user fetched", userResponse));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(Authentication authentication,
+            @RequestBody UpdateProfileRequest request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Not logged in"));
+        }
+        String email = authentication.getName();
+        User user = userService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            User updated = userService.updateUsername(user, request.getUsername());
+            return ResponseEntity.ok(ApiResponse.success("Profile updated", UserResponse.fromUser(updated)));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<?> changePassword(Authentication authentication,
+            @RequestBody ChangePasswordRequest request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Not logged in"));
+        }
+        String email = authentication.getName();
+        User user = userService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            userService.changePassword(user, request.getCurrentPassword(), request.getNewPassword());
+            return ResponseEntity.ok(ApiResponse.success("Password changed", null));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
 }

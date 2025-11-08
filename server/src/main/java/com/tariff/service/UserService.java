@@ -15,4 +15,8 @@ public interface UserService {
     boolean existsByEmail(String email);
 
     boolean validateCredentials(String username, String password);
+
+    User updateUsername(User user, String newUsername);
+
+    User changePassword(User user, String currentPassword, String newPassword);
 }
