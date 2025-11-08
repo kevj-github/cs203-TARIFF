@@ -158,7 +158,7 @@ export default function CalculatorPage() {
 	const [loading, setLoading] = useState(false);
 	const [isSimulationMode, setIsSimulationMode] = useState(false);
 	const [customTaxRate, setCustomTaxRate] = useState(0);
-	const [customTaxType, setCustomTaxType] = useState("AD_VALOREM");
+	const [customTaxType, setCustomTaxType] = useState("");
 	const [isLoadingDefaults, setIsLoadingDefaults] = useState(false);
 
 	const form = useForm<z.infer<typeof FormSchema>>({
