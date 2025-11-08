@@ -58,61 +58,43 @@ public class SecurityConfig {
     }
 
     // Security filter chain (main Spring Security config)
-    // @Bean
-    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
-    // Exception {
-    // http
-    // .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
-    // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-    // .authorizeHttpRequests(auth -> auth
-    // .requestMatchers("/api/auth/**").permitAll() // Auth endpoints
-    // .requestMatchers("/api/public/**").permitAll() // Public endpoints
-    // .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
-    // "/swagger-ui.html").permitAll() // API //
-    // // docs
-    // .requestMatchers("/api/products/**", "/api/tariff-rules/**").authenticated()
-    // // Public product
-    // // endpoints
-    // .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
-    // .requestMatchers("/api/calculate").authenticated() // Calculator endpoints
-    // .anyRequest().authenticated() // All other endpoints require authentication
-    // )
-    // .sessionManagement(session -> session
-    // .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    // .addFilterBefore(jwtAuthenticationFilter,
-    // UsernamePasswordAuthenticationFilter.class)
-    // .formLogin(form -> form.disable())
-    // .httpBasic(basic -> basic.disable())
-    // .headers(headers -> headers.frameOptions().disable()); // For H2 console
-
-    // return http.build();
-    // }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/products/**").authenticated() // Add this
-                        .requestMatchers(HttpMethod.PUT, "/api/products/**").authenticated() // Add this
-                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").authenticated() // Add this
-                        .requestMatchers("/api/tariff-rules/**").authenticated()
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/calculate").authenticated()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/auth/**").permitAll() // Auth endpoints
+                        .requestMatchers("/api/public/**").permitAll() // Public endpoints
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
+                                "/swagger-ui.html")
+                        .permitAll() // API //
+                        // docs
+                        .requestMatchers("/api/products/**", "/api/tariff-rules/**").authenticated()
+                        // .requestMatchers("/api/tariff-rules/**").authenticated()
+                        // .requestMatchers("/api/products/**").permitAll()
+
+                        // .requestMatchers(HttpMethod.GET, "/api/products/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/products/**").authenticated() // Add
+                        // .requestMatchers(HttpMethod.PUT, "/api/products/**").authenticated() // Add
+                        // this
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").authenticated() //
+                        // Add this
+                        // Public product
+                        // endpoints
+                        .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
+                        .requestMatchers("/api/calculate").authenticated() // Calculator endpoints
+                        .anyRequest().authenticated() // All other endpoints require authentication
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
-                .headers(headers -> headers.frameOptions().disable());
+                .headers(headers -> headers.frameOptions().disable()); // For H2 console
 
         return http.build();
     }
+
 }
