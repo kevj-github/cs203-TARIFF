@@ -7,6 +7,7 @@ import com.tariff.service.TariffRuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class TariffRuleController {
 
     @Operation(summary = "Create a new tariff rule (electronics: ad valorem / specific / compound)")
     @PostMapping(consumes = "application/json", produces = "application/json")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<TariffRuleResponse>> create(@Valid @RequestBody CreateTariffRuleRequest req) {
         TariffRuleResponse resp = service.create(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Tariff rule created", resp));

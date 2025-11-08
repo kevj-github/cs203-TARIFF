@@ -9,6 +9,7 @@ import {
 	User2,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
+import { getUser } from "@/lib/auth";
 
 import {
 	Sidebar,
@@ -21,43 +22,43 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// Menu items.
-const items = [
-	{
-		title: "Home",
-		url: "/home",
-		icon: Home,
-	},
-	{
-		title: "Product",
-		url: "/product",
-		icon: BaggageClaim,
-	},
-	{
-		title: "Calculator",
-		url: "/calculator",
-		icon: Calculator,
-	},
-	{
-		title: "Search",
-		url: "#",
-		icon: Search,
-	},
-	{
-		title: "Admin",
-		url: "/admin/rules",
-		icon: Settings,
-	},
-	{
-		title: "Profile",
-		url: "/profile",
-		icon: User2,
-	},
+// Base menu items.
+const baseItems = [
+    {
+        title: "Home",
+        url: "/home",
+        icon: Home,
+    },
+    {
+        title: "Product",
+        url: "/product",
+        icon: BaggageClaim,
+    },
+    {
+        title: "Calculator",
+        url: "/calculator",
+        icon: Calculator,
+    },
+    {
+        title: "Search",
+        url: "#",
+        icon: Search,
+    },
+    {
+        title: "Profile",
+        url: "/profile",
+        icon: User2,
+    },
 ];
 
 export function AppSidebar() {
-	return (
-		<Sidebar variant="inset" collapsible="icon">
+    const user = getUser();
+    const isAdmin = user?.role === "ADMIN";
+    const items = isAdmin
+        ? [...baseItems, { title: "Admin", url: "/admin/rules", icon: Settings }]
+        : baseItems;
+    return (
+        <Sidebar variant="inset" collapsible="icon">
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarGroupLabel>Application</SidebarGroupLabel>
