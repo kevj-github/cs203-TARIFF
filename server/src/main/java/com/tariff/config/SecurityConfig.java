@@ -4,6 +4,7 @@ import com.tariff.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -43,9 +45,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173", // Vite dev server
+                "http://localhost:5173", // Vite default dev server
+                "http://localhost:5175", // Alternate dev server (project controllers reference)
                 "http://localhost:3000", // Alternative dev port
-                "http://localhost:8080" // Production URL
+                "http://localhost:8080" // Backend origin (if serving static)
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
@@ -65,8 +68,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Auth endpoints
                         .requestMatchers("/api/public/**").permitAll() // Public endpoints
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API                                          // docs
-                        .requestMatchers("/api/products/**").authenticated() // Public product endpoints
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API docs
+                        .requestMatchers("/api/products/**").authenticated() // Product endpoints require auth
                         .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
                         .requestMatchers("/api/calculate").authenticated() // Calculator endpoints
                         .anyRequest().authenticated() // All other endpoints require authentication
