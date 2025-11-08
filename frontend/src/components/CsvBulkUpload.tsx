@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Upload, Download, AlertCircle, CheckCircle2, FileSpreadsheet } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatNumber, formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getToken } from "@/lib/auth";
 
 interface CalculationResult {
@@ -152,7 +152,8 @@ export function CsvBulkUpload() {
               <Button
                 onClick={handleUpload}
                 disabled={!file || loading}
-                className="bg-blue-600 hover:bg-blue-700"
+                size="lg"
+                className="bg-blue-600 text-white font-semibold shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all"
               >
                 {loading ? "Processing..." : "Calculate Tariffs"}
               </Button>
@@ -169,21 +170,21 @@ export function CsvBulkUpload() {
           </div>
 
           {/* CSV Format Instructions */}
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
+          <div className="p-3 bg-yellow-50 rounded-md border border-yellow-100 flex items-start gap-3">
+            <AlertCircle className="h-4 w-4 text-yellow-700 mt-1" />
+            <div className="text-sm text-yellow-900">
               <strong>CSV Format:</strong> productId, originCountry, destCountry, quantity, customsValue
               <br />
               <strong>Example:</strong> 1,CN,US,100,500.00
-            </AlertDescription>
-          </Alert>
+            </div>
+          </div>
 
           {/* Error Message */}
           {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            <div className="p-3 bg-red-50 rounded-md border border-red-100 flex items-start gap-3">
+              <AlertCircle className="h-4 w-4 text-red-600 mt-1" />
+              <div className="text-sm text-red-800">{error}</div>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -219,8 +220,8 @@ export function CsvBulkUpload() {
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <p className="text-sm text-gray-600">Grand Total</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    ${results.summary.grandTotal.toFixed(2)}
+                    <p className="text-2xl font-bold text-blue-600">
+                    {formatCurrency(results.summary.grandTotal)}
                   </p>
                 </div>
               </div>
@@ -229,19 +230,19 @@ export function CsvBulkUpload() {
                 <div className="p-3 border rounded-lg">
                   <p className="text-sm text-gray-600">Total Customs Value</p>
                   <p className="text-xl font-semibold">
-                    ${results.summary.totalCustomsValue.toFixed(2)}
+                    {formatCurrency(results.summary.totalCustomsValue)}
                   </p>
                 </div>
                 <div className="p-3 border rounded-lg">
                   <p className="text-sm text-gray-600">Total Tariff</p>
                   <p className="text-xl font-semibold">
-                    ${results.summary.totalTariff.toFixed(2)}
+                    {formatCurrency(results.summary.totalTariff)}
                   </p>
                 </div>
-                <div className="p-3 border rounded-lg">
+                  <div className="p-3 border rounded-lg">
                   <p className="text-sm text-gray-600">Grand Total</p>
                   <p className="text-xl font-semibold text-blue-600">
-                    ${results.summary.grandTotal.toFixed(2)}
+                    {formatCurrency(results.summary.grandTotal)}
                   </p>
                 </div>
               </div>
@@ -300,17 +301,17 @@ export function CsvBulkUpload() {
                         <td className="px-4 py-2 text-right">{calc.quantity}</td>
                         <td className="px-4 py-2 text-right">
                           {calc.success
-                            ? `$${calc.customsValueTotal.toFixed(2)}`
+                            ? formatCurrency(calc.customsValueTotal)
                             : "-"}
                         </td>
                         <td className="px-4 py-2 text-right">
                           {calc.success
-                            ? `$${calc.tariffAmount.toFixed(2)}`
+                            ? formatCurrency(calc.tariffAmount)
                             : "-"}
                         </td>
                         <td className="px-4 py-2 text-right font-semibold">
                           {calc.success
-                            ? `$${calc.totalWithTariff.toFixed(2)}`
+                            ? formatCurrency(calc.totalWithTariff)
                             : "-"}
                         </td>
                         <td className="px-4 py-2">
