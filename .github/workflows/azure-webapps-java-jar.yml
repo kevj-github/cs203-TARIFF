@@ -22,6 +22,7 @@ name: Deploy to Azure Web App (anglify - Spring Boot)
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,18 +41,17 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      # Build the JAR inside /server
       - name: Build JAR (Gradle)
         working-directory: server
-        run: ./gradlew clean bootJar -x test
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean bootJar -x test
 
-      - name: Azure login (publish profile)
-        uses: azure/login@v2
-        with:
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+      # 🔴 Remove azure/login — not needed with publish profile
 
       - name: Deploy to App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: anglify
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: server/build/libs/*.jar
