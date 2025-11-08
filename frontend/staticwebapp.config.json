@@ -1,0 +1,10 @@
+{
+  "navigationFallback": { "rewrite": "/index.html" },
+  "routes": [
+    {
+      "route": "/api/*",
+      "rewrite": "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net/api/{*path}",
+      "allowedRoles": ["anonymous"]
+    }
+  ]
+}
