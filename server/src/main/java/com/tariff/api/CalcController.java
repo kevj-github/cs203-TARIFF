@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5175"})
 @RequestMapping("/api/calculate")
 public class CalcController {
 

@@ -5,33 +5,40 @@ import { CsvBulkUpload } from "@/components/CsvBulkUpload";
 // import "./App";
 import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignUp";
+import TariffRuleForm from "./components/admin/TariffRuleForm";
 import AppLayout from "./AppLayout";
 import ProductsPage from "./components/ProductsPage";
 import ProfilePage from "./components/ProfilePage";
 import "react-day-picker/style.css";
 
 import { ProtectedRoute } from "./components/protected-route";
+import { AdminRoute } from "./components/admin-route";
 import TariffDashboard from "./components/TariffDashboard";
 import CalculatorPage from "./components/CalculatorPage";
+import Dashboard from "./components/Dashboard";
 
 function App() {
-  return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/" element={<Navigate to="/login" />} />
+	return (
+		<Routes>
+			<Route path="/login" element={<LoginPage />} />
+			<Route path="/signup" element={<SignupPage />} />
+			<Route path="/" element={<Navigate to="/login" />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route element={<AppLayout />}>
-          <Route path="/home" element={<TariffDashboard />} />
-          <Route path="/product" element={<ProductsPage />} />
-          <Route path="/calculator" element={<CalculatorPage />} />
-          <Route path="/bulk-upload" element={<CsvBulkUpload />} />
-          <Route path="/profile" element={<ProfilePage />} />
-        </Route>
-      </Route>
-    </Routes>
-  );
+
+            <Route element={<ProtectedRoute />}>
+                <Route element={<AppLayout />}>
+                    <Route path="/home" element={<Dashboard />} />
+                    <Route path="/product" element={<ProductsPage />} />
+                    <Route path="/calculator" element={<CalculatorPage />} />
+                    <Route path="/bulk-upload" element={<CsvBulkUpload />} />
+                    <Route element={<AdminRoute />}>
+                        <Route path="/admin/rules" element={<TariffRuleForm />} />
+                    </Route>
+                    <Route path="/profile" element={<ProfilePage />} />
+                </Route>
+            </Route>
+		</Routes>
+	);
 }
 
 export default App;

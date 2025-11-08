@@ -7,22 +7,24 @@ import {
   Search,
   Settings,
   User2,
-  FileSpreadsheet, // NEW ICON
+  FileSpreadsheet, 
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
+import { getUser } from "@/lib/auth";
+
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+	Sidebar,
+	SidebarContent,
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// Menu items.
-const items = [
+// Base menu items (common to all users)
+const baseItems = [
   {
     title: "Home",
     url: "/home",
@@ -39,7 +41,7 @@ const items = [
     icon: Calculator,
   },
   {
-    title: "Bulk Upload", // NEW MENU ITEM
+    title: "Bulk Upload", 
     url: "/bulk-upload",
     icon: FileSpreadsheet,
   },
@@ -56,8 +58,16 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const user = getUser();
+  const isAdmin = user?.role === "ADMIN";
+
+  // If admin → include the Rules menu
+  const items = isAdmin
+    ? [...baseItems, { title: "Rules", url: "/admin/rules", icon: Settings }]
+    : baseItems;
+
   return (
-    <Sidebar>
+    <Sidebar variant="inset" collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -71,7 +81,7 @@ export function AppSidebar() {
                       className={({ isActive }) =>
                         `flex items-center gap-2 p-2 rounded transition-colors ${
                           isActive
-                            ? "bg-red-500 text-white" // active route
+                            ? "bg-red-500 text-white"
                             : "text-black hover:bg-red-500 hover:text-white"
                         }`
                       }
