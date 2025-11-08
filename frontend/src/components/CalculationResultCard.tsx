@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 
 import { motion } from "framer-motion";
+import { formatNumber, formatCurrency } from "@/lib/format";
 
 interface CalculationResultProps {
   baseDuty: number;
@@ -107,7 +108,7 @@ export function CalculationResultCard({
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-bold text-blue-800 text-right">
-                      {baseDuty} USD
+                      ${formatNumber(baseDuty)} USD
                     </p>
                   </CardContent>
                 </Card>
@@ -130,7 +131,7 @@ export function CalculationResultCard({
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-bold text-green-800 text-right">
-                      {total} USD
+                      ${formatNumber(total)} USD
                     </p>
                   </CardContent>
                 </Card>

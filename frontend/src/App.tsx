@@ -1,6 +1,7 @@
 import "./App.css";
 
 import { Routes, Route, Navigate } from "react-router-dom";
+import { CsvBulkUpload } from "@/components/CsvBulkUpload";
 // import "./App";
 import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignUp";
@@ -23,11 +24,13 @@ function App() {
 			<Route path="/signup" element={<SignupPage />} />
 			<Route path="/" element={<Navigate to="/login" />} />
 
+
             <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
                     <Route path="/home" element={<Dashboard />} />
                     <Route path="/product" element={<ProductsPage />} />
                     <Route path="/calculator" element={<CalculatorPage />} />
+                    <Route path="/bulk-upload" element={<CsvBulkUpload />} />
                     <Route element={<AdminRoute />}>
                         <Route path="/admin/rules" element={<TariffRuleForm />} />
                     </Route>
