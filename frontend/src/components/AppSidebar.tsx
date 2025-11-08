@@ -55,7 +55,7 @@ export function AppSidebar() {
     const user = getUser();
     const isAdmin = user?.role === "ADMIN";
     const items = isAdmin
-        ? [...baseItems, { title: "Admin", url: "/admin/rules", icon: Settings }]
+        ? [...baseItems, { title: "Rules", url: "/admin/rules", icon: Settings }]
         : baseItems;
     return (
         <Sidebar variant="inset" collapsible="icon">
