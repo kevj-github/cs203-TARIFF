@@ -157,7 +157,7 @@ export default function CalculatorPage() {
 	const [result, setResult] = useState<any | null>(null); // store backend result
 	const [loading, setLoading] = useState(false);
 	const [isSimulationMode, setIsSimulationMode] = useState(false);
-	const [customTaxRate, setCustomTaxRate] = useState(0);
+	const [customTaxRate, setCustomTaxRate] = useState<string>("");
 	const [customTaxType, setCustomTaxType] = useState("");
 	const [isLoadingDefaults, setIsLoadingDefaults] = useState(false);
 
@@ -233,20 +233,20 @@ export default function CalculatorPage() {
 				// prefer percent if unit indicates percent, otherwise use numeric rate
 				const unit: string = r.unit || "";
 				const rateNum = Number(r.rate ?? 0);
-				if (unit.includes("PERCENT")) {
-					setCustomTaxType(mapType(r.type));
-					setCustomTaxRate(rateNum);
-				} else if (
-					unit.includes("USD_PER_UNIT") ||
-					unit.includes("SGD_PER_UNIT")
-				) {
-					setCustomTaxType("SPECIFIC");
-					setCustomTaxRate(rateNum);
-				} else {
-					// fallback
-					setCustomTaxType(mapType(r.type));
-					setCustomTaxRate(rateNum);
-				}
+					if (unit.includes("PERCENT")) {
+						setCustomTaxType(mapType(r.type));
+						setCustomTaxRate(String(rateNum));
+					} else if (
+						unit.includes("USD_PER_UNIT") ||
+						unit.includes("SGD_PER_UNIT")
+					) {
+						setCustomTaxType("SPECIFIC");
+						setCustomTaxRate(String(rateNum));
+					} else {
+						// fallback
+						setCustomTaxType(mapType(r.type));
+						setCustomTaxRate(String(rateNum));
+					}
 			}
 		} catch (err) {
 			// don't block user; just log
@@ -283,12 +283,12 @@ export default function CalculatorPage() {
 				on: data.on,
 				customsValue: Number(data.customsValue),
 				quantity: Number(data.quantity),
-				simulation: isSimulationMode
-					? {
-							taxRate: customTaxRate,
-							taxType: customTaxType,
-					  }
-					: null,
+					simulation: isSimulationMode
+						? {
+								taxRate: Number(customTaxRate || 0),
+								taxType: customTaxType,
+							}
+						: null,
 			};
 
 			const result = await api.post("/calculate", payload);
