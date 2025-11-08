@@ -19,26 +19,27 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+        @Autowired
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // Password encoder bean (for user registration/login)
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        // Password encoder bean (for user registration/login)
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    // AuthenticationManager (needed for login service)
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
+        // AuthenticationManager (needed for login service)
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+                return authConfig.getAuthenticationManager();
+        }
 
     // CORS config (allow frontend to talk to backend)
     @Bean
@@ -54,33 +55,41 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 
-    // Security filter chain (main Spring Security config)
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Auth endpoints
-                        .requestMatchers("/api/public/**").permitAll() // Public endpoints
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API docs
-                        .requestMatchers("/api/products/**").authenticated() // Product endpoints require auth
-                        .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
-                        .requestMatchers("/api/calculate").authenticated() // Calculator endpoints
-                        .anyRequest().authenticated() // All other endpoints require authentication
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable())
-                .headers(headers -> headers.frameOptions().disable()); // For H2 console
+        // Security filter chain (main Spring Security config)
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/auth/**").permitAll() // Auth endpoints
+                                                .requestMatchers("/api/public/**").permitAll() // Public endpoints
+                                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
+                                                                "/swagger-ui.html")
+                                                .permitAll() // API
+                                                .requestMatchers("/api/products/**", "/api/tariff-rules/**")
+                                                .authenticated()
 
-        return http.build();
-    }
+                                                .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
+                                                .requestMatchers("/api/calculate").authenticated() // Calculator
+                                                                                                   // endpoints
+                                                .anyRequest().authenticated() // All other endpoints require
+                                                                              // authentication
+                                )
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .addFilterBefore(jwtAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class)
+                                .formLogin(form -> form.disable())
+                                .httpBasic(basic -> basic.disable())
+                                .headers(headers -> headers.frameOptions().disable()); // For H2 console
+
+                return http.build();
+        }
+
 }

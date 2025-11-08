@@ -14,6 +14,7 @@ import { ProtectedRoute } from "./components/protected-route";
 import { AdminRoute } from "./components/admin-route";
 import TariffDashboard from "./components/TariffDashboard";
 import CalculatorPage from "./components/CalculatorPage";
+import Dashboard from "./components/Dashboard";
 
 function App() {
 	return (
