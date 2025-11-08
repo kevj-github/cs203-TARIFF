@@ -13,6 +13,7 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import ProductsTable from "./ProductsTable";
+import { getUser } from "@/lib/auth";
 
 interface Product {
   id: number;
@@ -33,6 +34,10 @@ export default function ProductsPage() {
     productType: "",
     hsCode: "",
   });
+
+  // Determine admin role from stored user
+  const user = getUser();
+  const isAdmin = user?.role === "ADMIN";
 
   //   useEffect(() => {
   //     const fetchProducts = async () => {
@@ -104,7 +109,8 @@ export default function ProductsPage() {
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Products</h1>
 
-      <ProductsTable />
+      {/* Pass admin gating to table */}
+      <ProductsTable isAdmin={isAdmin} />
     </div>
   );
 }

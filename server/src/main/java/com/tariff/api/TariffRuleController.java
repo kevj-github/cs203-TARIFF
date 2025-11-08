@@ -102,10 +102,11 @@ public class TariffRuleController {
     @Operation(summary = "Query tariff rules applicable on a given date")
     @GetMapping(produces = "application/json")
     public ResponseEntity<ApiResponse<List<TariffRuleResponse>>> findApplicable(
-            @RequestParam @Parameter(example = "SG") @Pattern(regexp = "^[A-Z]{2}$", message = "Origin must be ISO2 uppercase") String origin,
-            @RequestParam @Parameter(example = "US") @Pattern(regexp = "^[A-Z]{2}$", message = "Destination must be ISO2 uppercase") String dest,
-            @RequestParam @Parameter(example = "8517.12") @Pattern(regexp = "^[0-9]{2,6}(?:\\.[0-9]{2})?$", message = "HS code must be 2–6 digits, optional dot+2 digits") String hs,
-            @RequestParam(name = "on") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(example = "2025-09-17") LocalDate onDate) {
+            @RequestParam(required = false) @Parameter(example = "SG") @Pattern(regexp = "^[A-Z]{2}$", message = "Origin must be ISO2 uppercase") String origin,
+            @RequestParam(required = false) @Parameter(example = "US") @Pattern(regexp = "^[A-Z]{2}$", message = "Destination must be ISO2 uppercase") String dest,
+            @RequestParam(required = false) @Parameter(example = "8517.12") @Pattern(regexp = "^[0-9]{2,6}(?:\\.[0-9]{2})?$", message = "HS code must be 2–6 digits, optional dot+2 digits") String hs,
+            @RequestParam(name = "on", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(example = "2025-09-17") LocalDate onDate) {
+        // Service already handles nulls and defaults to today's date for onDate
         List<TariffRuleResponse> rules = service.findApplicable(origin, dest, hs, onDate)
                 .stream()
                 .map(TariffRuleService::toResp)

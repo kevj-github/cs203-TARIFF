@@ -69,12 +69,8 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/api/auth/**").permitAll() // Auth endpoints
                                                 .requestMatchers("/api/public/**").permitAll() // Public endpoints
-                                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
-                                                                "/swagger-ui.html")
-                                                .permitAll() // API
-                                                .requestMatchers("/api/products/**", "/api/tariff-rules/**")
-                                                .authenticated()
-
+                                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API
+                                                .requestMatchers("/api/products/**", "/api/tariff-rules/**").authenticated()
                                                 .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
                                                 .requestMatchers("/api/calculate").authenticated() // Calculator
                                                                                                    // endpoints

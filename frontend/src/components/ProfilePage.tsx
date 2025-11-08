@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
+import { logout as doLogout } from "@/lib/auth";
 
 interface UserProfile {
     id: number;
@@ -9,6 +11,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+    const navigate = useNavigate();
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -180,6 +183,22 @@ export default function ProfilePage() {
                     )}
                 </div>
             )}
+
+            {/* Logout */}
+            <h2 className="text-xl font-semibold mt-6 mb-2">Account</h2>
+            <div className="bg-white shadow-md rounded-lg p-6 space-y-2">
+                <p className="text-sm text-gray-600">End your current session.</p>
+                <button
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    onClick={() => {
+                        // Clear local auth and redirect to login
+                        doLogout();
+                        navigate("/login");
+                    }}
+                >
+                    Logout
+                </button>
+            </div>
         </div>
     );
 }

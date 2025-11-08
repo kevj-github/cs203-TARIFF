@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import com.tariff.domain.Product;
 import com.tariff.repo.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Product>> createProduct(@RequestBody Product product) {
         Product savedProduct = productRepository.save(product);
         return ResponseEntity.ok(ApiResponse.success("Product created successfully", savedProduct));
@@ -51,6 +53,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productRepository.deleteById(id);
         return ResponseEntity.ok(ApiResponse.success("Product deleted successfully", null));

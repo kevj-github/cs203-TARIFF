@@ -78,7 +78,10 @@ type NewProduct = {
   model?: string | null;
 };
 
-const makeColumns = (onDelete: (p: Product) => void): ColumnDef<Product>[] => [
+const makeColumns = (
+  onDelete: (p: Product) => void,
+  canDelete: boolean
+): ColumnDef<Product>[] => [
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -169,13 +172,23 @@ const makeColumns = (onDelete: (p: Product) => void): ColumnDef<Product>[] => [
 
             <DropdownMenuSeparator className="my-1" />
 
-            <DropdownMenuItem
-              onClick={() => onDelete(p)}
-              className="flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer rounded-sm"
-            >
-              <Trash2 className="h-4 w-4 text-red-500" />
-              <span>Delete</span>
-            </DropdownMenuItem>
+            {canDelete ? (
+              <DropdownMenuItem
+                onClick={() => onDelete(p)}
+                className="flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer rounded-sm"
+              >
+                <Trash2 className="h-4 w-4 text-red-500" />
+                <span>Delete</span>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                disabled
+                className="flex items-center gap-2 text-sm text-gray-400 cursor-not-allowed"
+              >
+                <Trash2 className="h-4 w-4 text-gray-300" />
+                <span>Delete (admin only)</span>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -183,7 +196,11 @@ const makeColumns = (onDelete: (p: Product) => void): ColumnDef<Product>[] => [
   },
 ];
 
-export default function ProductsTable() {
+export default function ProductsTable({
+  isAdmin = false,
+}: {
+  isAdmin?: boolean;
+}) {
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -270,6 +287,14 @@ export default function ProductsTable() {
 
   // DELETE
   const handleDelete = async (p: Product) => {
+    if (!isAdmin) {
+      setAlert({
+        type: "error",
+        title: "Not allowed",
+        message: "Only admins can delete products.",
+      });
+      return;
+    }
     if (!confirm(`Delete product "${p.name}" (ID ${p.id})?`)) return;
 
     setDeleting(p.id);
@@ -296,6 +321,14 @@ export default function ProductsTable() {
 
   // CREATE
   const handleCreate = async () => {
+    if (!isAdmin) {
+      setAlert({
+        type: "error",
+        title: "Not allowed",
+        message: "Only admins can add products.",
+      });
+      return;
+    }
     if (!newProduct.name || !newProduct.productType || !newProduct.hsCode) {
       setAlert({
         type: "error",
@@ -337,7 +370,10 @@ export default function ProductsTable() {
   };
 
   // Columns (with delete wired)
-  const columns = React.useMemo(() => makeColumns(handleDelete), []);
+  const columns = React.useMemo(
+    () => makeColumns(handleDelete, isAdmin),
+    [isAdmin]
+  );
 
   // Client-side global filter across name / hsCode / productType
   const filteredData = React.useMemo(() => {
@@ -464,16 +500,17 @@ export default function ProductsTable() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Dialog open={addOpen} onOpenChange={setAddOpen}>
-          <DialogTrigger
-            asChild
-            className="ml-auto bg-white border border-gray-200 hover:bg-gray-50 shadow-sm text-gray-700 flex items-center gap-1"
-          >
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Add Product
-            </Button>
-          </DialogTrigger>
+        {isAdmin && (
+          <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            <DialogTrigger
+              asChild
+              className="ml-auto bg-white border border-gray-200 hover:bg-gray-50 shadow-sm text-gray-700 flex items-center gap-1"
+            >
+              <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add Product
+              </Button>
+            </DialogTrigger>
 
           <DialogContent className="sm:max-w-[600px] bg-white border border-gray-200 shadow-xl">
             <DialogHeader>
@@ -533,8 +570,9 @@ export default function ProductsTable() {
                 {saving ? "Adding…" : "Add Product"}
               </Button>
             </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">

@@ -25,7 +25,7 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
-                    <Route path="/home" element={<TariffDashboard />} />
+                    <Route path="/home" element={<Dashboard />} />
                     <Route path="/product" element={<ProductsPage />} />
                     <Route path="/calculator" element={<CalculatorPage />} />
                     <Route element={<AdminRoute />}>
