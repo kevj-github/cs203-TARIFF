@@ -10,28 +10,77 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Raw shape returned by backend (/api/calculations)
+  type RawCalculation = {
+    id?: number;
+    hsCode?: string;
+    originIso2?: string;
+    destIso2?: string;
+    declaredValuePerUnit?: number;
+    declaredValuePerUnitUsd?: number | string;
+    quantity?: number;
+    baseDuty?: number;
+    total?: number;
+    ruleApplied?: string;
+    indirectTax?: number;
+    calculatedAt?: string;
+    calcDate?: string; // yyyy-MM-dd
+    notes?: string;
+    user?: { id?: number } | null;
+    isSimulation?: boolean;
+  };
+
+  const mapFromRaw = (d: RawCalculation): SavedCalculation => {
+    const customsValueNum = (() => {
+      const v = d.declaredValuePerUnitUsd ?? d.declaredValuePerUnit ?? 0;
+      return typeof v === "string" ? Number(v) : Number(v || 0);
+    })();
+    const calcAtIso = d.calculatedAt
+      ? d.calculatedAt
+      : d.calcDate
+      ? `${d.calcDate}T00:00:00Z`
+      : new Date().toISOString();
+    return {
+      id: d.id,
+      userId: d.user?.id ?? 0,
+      origin: d.originIso2 || "",
+      dest: d.destIso2 || "",
+      hs: d.hsCode || "",
+      customsValue: customsValueNum,
+      quantity: Number(d.quantity || 0),
+      baseDuty: Number(d.baseDuty || 0),
+      total: Number(d.total || 0),
+      ruleApplied: d.ruleApplied || "",
+      indirectTax: Number(d.indirectTax || 0),
+      calculatedAt: calcAtIso,
+      notes: d.notes || undefined,
+      isSimulation: d.isSimulation ?? false,
+    };
+  };
+
   const fetchHistory = async () => {
     setLoading(true);
     setError(null);
     try {
-      let data: SavedCalculation[] | null = null;
+      let raw: RawCalculation[] | null = null;
       try {
-        data = await api.get<SavedCalculation[]>("/calculations");
+        raw = await api.get<RawCalculation[]>("/calculations");
       } catch (err: any) {
         // If forbidden, try alternate endpoints
         if (err?.message?.includes("permission")) {
           try {
-            data = await api.get<SavedCalculation[]>("/calculations/me");
+            raw = await api.get<RawCalculation[]>("/calculations/me");
           } catch {}
-          if (!data) {
+          if (!raw) {
             try {
-              data = await api.get<SavedCalculation[]>("/calculations/user");
+              raw = await api.get<RawCalculation[]>("/calculations/user");
             } catch {}
           }
         }
-        if (!data) throw err;
+        if (!raw) throw err;
       }
-      setItems(data || []);
+      const mapped = (raw || []).map(mapFromRaw);
+      setItems(mapped);
     } catch (err: any) {
       console.error("Failed to fetch history:", err);
       setError(err?.message || "Failed to load saved calculations");
@@ -93,6 +142,7 @@ export default function HistoryPage() {
                     <th className="p-2">Qty</th>
                     <th className="p-2">Duty</th>
                     <th className="p-2">Total</th>
+                    <th className="p-2">Sim</th>
                     <th className="p-2">Notes</th>
                     <th className="p-2">Actions</th>
                   </tr>
@@ -108,13 +158,16 @@ export default function HistoryPage() {
                       <td className="p-2 align-top">{it.quantity}</td>
                       <td className="p-2 align-top">{it.baseDuty}</td>
                       <td className="p-2 align-top">{it.total}</td>
+                      <td className="p-2 align-top">{it.isSimulation ? "Yes" : "No"}</td>
                       <td className="p-2 align-top">{it.notes || "-"}</td>
                       <td className="p-2 align-top">
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline" onClick={() => alert(JSON.stringify(it, null, 2))}>
-                            View
-                          </Button>
-                          <Button size="sm" variant="destructive" onClick={() => handleDelete(it.id)}>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="bg-red-600 text-white hover:bg-red-700"
+                            onClick={() => handleDelete(it.id)}
+                          >
                             Delete
                           </Button>
                         </div>

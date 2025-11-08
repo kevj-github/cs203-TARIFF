@@ -1,7 +1,10 @@
 import { getToken, logout } from "./auth";
 import type { ApiResponse } from "./types";
 
-const API_BASE_URL = "http://localhost:8080/api";
+// Prefer relative base in dev (proxied by Vite), allow override via env
+const API_BASE_URL =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) || 
+  "/api";
 
 /**
  * API client that automatically includes JWT token in requests

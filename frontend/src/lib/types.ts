@@ -17,17 +17,18 @@ export interface TariffRuleResponse {
 }
 
 export interface SavedCalculation {
-	id?: number;
-	userId: number;
-	origin: string;
-	dest: string;
-	hs: string;
-	customsValue: number;
-	quantity: number;
-	baseDuty: number;
-	total: number;
-	ruleApplied: string;
-	indirectTax?: number;
-	calculatedAt: string;
-	notes?: string;
+  id?: number;
+  userId: number;
+  origin: string;
+  dest: string;
+  hs: string;
+  customsValue: number;
+  quantity: number;
+  baseDuty: number;
+  total: number;
+  ruleApplied: string;
+  indirectTax?: number;
+  calculatedAt: string;
+  notes?: string;
+  isSimulation?: boolean;
 }

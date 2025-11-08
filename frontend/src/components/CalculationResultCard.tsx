@@ -25,6 +25,8 @@ interface CalculationResultProps {
   origin?: string;
   dest?: string;
   hs?: string;
+  on?: string; // YYYY-MM-DD import date
+  isSimulation?: boolean;
 }
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
@@ -44,7 +46,9 @@ export function CalculationResultCard({
   origin,
   dest,
   hs,
-}: CalculationResultProps & { origin?: string; dest?: string; hs?: string }) {
+  on,
+  isSimulation,
+}: CalculationResultProps & { origin?: string; dest?: string; hs?: string; on?: string }) {
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -61,12 +65,15 @@ export function CalculationResultCard({
       originIso2: origin,
       destIso2: dest,
       declaredValuePerUnit: customsValue,
+      declaredValuePerUnitUsd: customsValue,
       quantity,
       baseDuty,
       total,
       ruleApplied,
       indirectTax: indirectTax || 0,
       calculatedAt: new Date().toISOString(),
+      calcDate: on,
+      isSimulation: Boolean(isSimulation),
       notes: notesToSave?.trim() || undefined
     };
     console.debug("Saving calculation payload:", payload);
@@ -74,15 +81,23 @@ export function CalculationResultCard({
   };
   
 
-  // Extract rate from ruleApplied string if it's ad valorem
+  // Extract rate from ruleApplied string if present (e.g., "25%")
   const extractRate = (rule: string) => {
     const match = rule.match(/(\d+(\.\d+)?)%/);
     return match ? parseFloat(match[1]) : null;
   };
 
-  const rate = extractRate(ruleApplied);
-  const isAdValorem = ruleApplied.toLowerCase().includes("ad valorem");
-  const isSpecific = ruleApplied.toLowerCase().includes("specific");
+  const rateFromString = extractRate(ruleApplied);
+  const ruleLower = ruleApplied.toLowerCase();
+  const isAdValorem = ruleLower.includes("ad_valorem") || ruleLower.includes("ad valorem");
+  const isSpecific = ruleLower.includes("specific");
+  const isCompound = ruleLower.includes("compound");
+
+  // Infer percent rate from values if ad valorem/compound and not present in ruleApplied
+  const totalCustoms = Number(customsValue) * Number(quantity);
+  const inferredPercent = totalCustoms > 0 ? (Number(baseDuty) / totalCustoms) * 100 : null;
+  const percentRate = rateFromString ?? (isAdValorem || isCompound ? inferredPercent : null);
+  const specificPerUnit = Number(quantity) > 0 ? Number(baseDuty) / Number(quantity) : null;
   return (
     <>
       <Card className="mt-6 border border-gray-200 shadow-sm">
@@ -260,26 +275,32 @@ export function CalculationResultCard({
                       <div>
                         <p className="font-medium">Applied Rule</p>
                         <p className="mt-1 text-gray-600">{ruleApplied}</p>
-                        {isAdValorem && rate !== null && (
+                        {(isAdValorem || isCompound) && percentRate !== null && (
+                          <p className="mt-1 text-gray-700">Rate: {Number(percentRate.toFixed(2))}%</p>
+                        )}
+                        {isSpecific && specificPerUnit !== null && (
+                          <p className="mt-1 text-gray-700">Tax per unit: {Number(specificPerUnit.toFixed(2))} USD</p>
+                        )}
+                        {(isAdValorem || isCompound) && percentRate !== null && (
                           <div className="mt-2 pl-4 border-l-2 border-gray-200">
                             <p className="text-gray-600">
-                              Ad Valorem Rate: {rate}% of customs value
+                              Tax Rate: {Number(percentRate.toFixed(2))}% of customs value
                             </p>
                             <p className="text-gray-500 mt-1">
                               Formula: (Customs Value × Quantity) × Rate%
                             </p>
                             <p className="text-gray-500">
-                              = ({customsValue} × {quantity}) × {rate}%
+                              = ({customsValue} × {quantity}) × {Number(percentRate.toFixed(2))}%
                             </p>
                             <p className="text-gray-500">
-                              = {customsValue * quantity} × {rate}%
+                              = {customsValue * quantity} × {Number(percentRate.toFixed(2))}%
                             </p>
                             <p className="text-gray-500">
                               = {baseDuty} USD
                             </p>
                           </div>
                         )}
-                        {isSpecific && (
+                        {isSpecific && specificPerUnit !== null && (
                           <div className="mt-2 pl-4 border-l-2 border-gray-200">
                             <p className="text-gray-600">
                               Specific Rate: Fixed amount per unit
@@ -288,7 +309,7 @@ export function CalculationResultCard({
                               Formula: Rate per unit × Quantity
                             </p>
                             <p className="text-gray-500">
-                              = {(baseDuty / quantity).toFixed(2)} × {quantity}
+                              = {Number(specificPerUnit.toFixed(2))} × {quantity}
                             </p>
                             <p className="text-gray-500">
                               = {baseDuty} USD

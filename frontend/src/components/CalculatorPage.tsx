@@ -621,25 +621,27 @@ export default function CalculatorPage() {
 				)}
 
 				{/* Display Result */}
-				{result && (
-					<CalculationResultCard
-						baseDuty={result.baseDuty}
-						total={result.total}
-						ruleApplied={result.ruleApplied}
-						error={result.error}
-						customsValue={Number(form.getValues("customsValue"))}
-						quantity={Number(form.getValues("quantity"))}
-						indirectTax={result.indirectTax || 0}
-						origin={form.getValues("origin")}
-						dest={form.getValues("dest")}
-						hs={(() => {
-							const item = [...pcComponents, ...consumerElectronics, ...powerSupport].find(
-								(item) => String(item.id) === form.getValues("hs")
-							);
-							return item?.code || "";
-						})()}
-					/>
-				)}
+        {result && (
+          <CalculationResultCard
+            baseDuty={result.baseDuty}
+            total={result.total}
+            ruleApplied={result.ruleApplied}
+            error={result.error}
+            customsValue={Number(form.getValues("customsValue"))}
+            quantity={Number(form.getValues("quantity"))}
+            indirectTax={result.indirectTax || 0}
+            origin={form.getValues("origin")}
+            dest={form.getValues("dest")}
+            hs={(() => {
+              const item = [...pcComponents, ...consumerElectronics, ...powerSupport].find(
+                (item) => String(item.id) === form.getValues("hs")
+              );
+              return item?.code || "";
+            })()}
+            on={form.getValues("on")}
+            isSimulation={isSimulationMode}
+          />
+        )}
 			</div>
 		</>
 	);

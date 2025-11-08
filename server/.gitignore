@@ -8,9 +8,6 @@ node_modules/
 *.log
 dist/
 .vite/
-src/main/resources/application.yml
-src/main/resources/application.properties
-
 
 ### STS ###
 .apt_generated
