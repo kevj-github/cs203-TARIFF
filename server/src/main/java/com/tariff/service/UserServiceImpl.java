@@ -21,16 +21,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(String username, String email, String password) {
-        if (existsByUsername(username)) {
+        // Normalize inputs
+        String normalizedUsername = username == null ? null : username.trim();
+        String normalizedEmail = email == null ? null : email.trim().toLowerCase();
+
+        if (existsByUsername(normalizedUsername)) {
             throw new RuntimeException("Username already exists");
         }
-        if (existsByEmail(email)) {
+        if (existsByEmail(normalizedEmail)) {
             throw new RuntimeException("Email already exists");
         }
 
         User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
+        user.setUsername(normalizedUsername);
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(password));
         // Assign default role
         user.setRole("USER");

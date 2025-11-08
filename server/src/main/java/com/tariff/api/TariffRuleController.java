@@ -6,6 +6,8 @@ import com.tariff.api.dto.TariffRuleDtos.TariffRuleResponse;
 import com.tariff.service.TariffRuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -40,9 +42,9 @@ public class TariffRuleController {
     @Operation(summary = "Query tariff rules applicable on a given date")
     @GetMapping(produces = "application/json")
     public ResponseEntity<ApiResponse<List<TariffRuleResponse>>> findApplicable(
-            @RequestParam @Parameter(example = "SG") String origin,
-            @RequestParam @Parameter(example = "US") String dest,
-            @RequestParam @Parameter(example = "8517.12") String hs,
+            @RequestParam @Parameter(example = "SG") @Pattern(regexp = "^[A-Z]{2}$", message = "Origin must be ISO2 uppercase") String origin,
+            @RequestParam @Parameter(example = "US") @Pattern(regexp = "^[A-Z]{2}$", message = "Destination must be ISO2 uppercase") String dest,
+            @RequestParam @Parameter(example = "8517.12") @Pattern(regexp = "^[0-9]{2,6}(?:\\.[0-9]{2})?$", message = "HS code must be 2–6 digits, optional dot+2 digits") String hs,
             @RequestParam(name = "on") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(example = "2025-09-17") LocalDate onDate) {
         List<TariffRuleResponse> rules = service.findApplicable(origin, dest, hs, onDate)
                 .stream()

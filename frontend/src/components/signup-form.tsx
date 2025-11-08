@@ -35,15 +35,33 @@ export function SignupForm({
 		e.preventDefault();
 		setError("");
 
+		const trimmedUsername = username.trim();
+		const trimmedEmail = email.trim().toLowerCase();
+		const passwordHasDigit = /\d/.test(password);
+		const usernameValid = /^[A-Za-z0-9_.-]{3,20}$/.test(trimmedUsername);
+		const emailValid = /.+@.+\..+/.test(trimmedEmail);
+
 		if (password !== confirmPassword) {
 			setError("Passwords do not match");
+			return;
+		}
+		if (!usernameValid) {
+			setError("Username must be 3–20 chars; letters, numbers, _, ., - only");
+			return;
+		}
+		if (!emailValid) {
+			setError("Please enter a valid email address");
+			return;
+		}
+		if (password.length < 8 || !passwordHasDigit) {
+			setError("Password must be ≥8 characters and contain a number");
 			return;
 		}
 
 		try {
 			const data = await api.post<JwtAuthData>("/auth/register", {
-				username,
-				email,
+				username: trimmedUsername,
+				email: trimmedEmail,
 				password,
 			});
 			if (data) {
