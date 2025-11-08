@@ -9,13 +9,14 @@ import { setToken, setUser } from "@/lib/auth";
 import { api } from "@/lib/api";
 
 interface JwtAuthData {
-	accessToken: string;
-	tokenType: string;
-	user: {
-		id: number;
-		username: string;
-		email: string;
-	};
+    accessToken: string;
+    tokenType: string;
+    user: {
+        id: number;
+        username: string;
+        email: string;
+        role: string;
+    };
 }
 // NOTE: Signup uses the same JwtAuthData shape as login; ApiResponse wrapper is handled by `api` client
 

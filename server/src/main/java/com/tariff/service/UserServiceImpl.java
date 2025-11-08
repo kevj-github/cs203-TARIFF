@@ -32,6 +32,8 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        // Assign default role
+        user.setRole("USER");
 
         return userRepository.save(user);
     }
@@ -61,5 +63,33 @@ public class UserServiceImpl implements UserService {
         return findByUsername(username)
                 .map(user -> passwordEncoder.matches(password, user.getPassword()))
                 .orElse(false);
+    }
+
+    @Override
+    public User updateUsername(User user, String newUsername) {
+        String trimmed = newUsername == null ? null : newUsername.trim();
+        if (trimmed == null || trimmed.isEmpty()) {
+            throw new RuntimeException("Username cannot be empty");
+        }
+        if (!user.getUsername().equals(trimmed) && existsByUsername(trimmed)) {
+            throw new RuntimeException("Username already exists");
+        }
+        user.setUsername(trimmed);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User changePassword(User user, String currentPassword, String newPassword) {
+        if (currentPassword == null || newPassword == null) {
+            throw new RuntimeException("Passwords cannot be null");
+        }
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+        if (newPassword.length() < 8) {
+            throw new RuntimeException("New password must be at least 8 characters");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return userRepository.save(user);
     }
 }
