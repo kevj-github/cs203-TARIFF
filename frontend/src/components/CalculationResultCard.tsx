@@ -13,7 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
-
+import { api } from "@/lib/api";
 interface CalculationResultProps {
   baseDuty: number;
   total: number;
@@ -25,7 +25,6 @@ interface CalculationResultProps {
   origin?: string;
   dest?: string;
   hs?: string;
-  onSave?: (notes: string) => Promise<void>;
 }
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
@@ -45,13 +44,35 @@ export function CalculationResultCard({
   origin,
   dest,
   hs,
-  onSave,
-}: CalculationResultProps) {
+}: CalculationResultProps & { origin?: string; dest?: string; hs?: string }) {
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
-  const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const { toast } = useToast();
+  const [notes, setNotes] = useState("");
+  const toast = useToast();
+
+  const saveCalculation = async (notesToSave: string) => {
+    const payload = {
+      origin,
+      dest,
+      hs,
+      // also include server-expected field names to avoid mapping issues
+      hsCode: hs,
+      originIso2: origin,
+      destIso2: dest,
+      declaredValuePerUnit: customsValue,
+      quantity,
+      baseDuty,
+      total,
+      ruleApplied,
+      indirectTax: indirectTax || 0,
+      calculatedAt: new Date().toISOString(),
+      notes: notesToSave?.trim() || undefined
+    };
+    console.debug("Saving calculation payload:", payload);
+    return api.post("/calculations/save", payload);
+  };
+  
 
   // Extract rate from ruleApplied string if it's ad valorem
   const extractRate = (rule: string) => {
@@ -310,8 +331,8 @@ export function CalculationResultCard({
           </>
         )}
 
-        {/* Save Button and Dialog */}
-        {!error && onSave && (
+  {/* Save Button and Dialog */}
+  {!error && (
           <div className="px-6 py-4 border-t border-gray-200">
             <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
               <DialogTrigger asChild>
@@ -365,14 +386,15 @@ export function CalculationResultCard({
                     onClick={async () => {
                       try {
                         setIsSaving(true);
-                        await onSave(notes);
+                        await saveCalculation(notes);
                         setIsSaveDialogOpen(false);
-                        toast({
-                          title: "Success",
-                          description: "Calculation saved successfully",
+                        toast.toast({
+                          title: "Calculation saved!",
+                          description: "Your calculation has been saved to history.",
+                          status: "success",
                         });
                       } catch (error) {
-                        toast({
+                        toast.toast({
                           variant: "destructive",
                           title: "Error",
                           description: "Failed to save calculation",

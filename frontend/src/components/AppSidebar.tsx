@@ -8,7 +8,7 @@ import {
   Settings,
   User2,
 } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import {
   Sidebar,
@@ -38,6 +38,11 @@ const items = [
     title: "Calculator",
     url: "/calculator",
     icon: Calculator,
+  },
+  {
+    title: "History",
+    url: "/calculations",
+    icon: Calendar,
   },
   {
     title: "Search",

@@ -36,7 +36,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CalculationResultCard } from "./CalculationResultCard";
 import { SimulationPanel } from "./SimulationPanel";
 
@@ -201,11 +201,12 @@ export default function CalculatorPage() {
 	}, [originVal, destVal, hsVal, onVal]);
 
 	const fetchDefaultRule = async () => {
-		// only fetch when all fields have values
-		if (!originVal || !destVal || !hsVal || !onVal) {
-			console.warn("Cannot fetch defaults: missing required fields");
-			return;
-		}
+			// only fetch when all fields have values
+			if (!originVal || !destVal || !hsVal || !onVal) {
+				// not an error — just early-return until the user fills in the form
+				console.debug("Cannot fetch defaults: missing required fields");
+				return;
+			}
 
 		setIsLoadingDefaults(true);
 		try {
@@ -631,28 +632,12 @@ export default function CalculatorPage() {
 						indirectTax={result.indirectTax || 0}
 						origin={form.getValues("origin")}
 						dest={form.getValues("dest")}
-						hs={form.getValues("hs")}
-						onSave={async (notes) => {
-							const selectedItem = [...pcComponents, ...consumerElectronics, ...powerSupport].find(
+						hs={(() => {
+							const item = [...pcComponents, ...consumerElectronics, ...powerSupport].find(
 								(item) => String(item.id) === form.getValues("hs")
 							);
-
-							const payload = {
-								origin: form.getValues("origin"),
-								dest: form.getValues("dest"),
-								hs: selectedItem?.code || "",
-								customsValue: Number(form.getValues("customsValue")),
-								quantity: Number(form.getValues("quantity")),
-								baseDuty: result.baseDuty,
-								total: result.total,
-								ruleApplied: result.ruleApplied,
-								indirectTax: result.indirectTax || 0,
-								calculatedAt: new Date().toISOString(),
-								notes
-							};
-
-							await api.post("/calculations", payload);
-						}}
+							return item?.code || "";
+						})()}
 					/>
 				)}
 			</div>

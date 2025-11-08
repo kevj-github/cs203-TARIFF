@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/products/**").authenticated() // Public product endpoints
                         .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
                         .requestMatchers("/api/calculate").authenticated() // Calculator endpoints
+                        .requestMatchers("/api/calculations/**").authenticated() // Calculation endpoints
                         .anyRequest().authenticated() // All other endpoints require authentication
                 )
                 .sessionManagement(session -> session
