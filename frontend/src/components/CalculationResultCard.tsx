@@ -2,16 +2,14 @@
 
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
 import { motion } from "framer-motion";
-import { formatNumber, formatCurrency } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 
 interface CalculationResultProps {
   baseDuty: number;

@@ -37,7 +37,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -59,7 +58,7 @@ import {
 } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
 
-type ApiResponse<T> = { success: boolean; message: string; data: T };
+// type ApiResponse<T> = { success: boolean; message: string; data: T };
 
 export type Product = {
   id: number;
@@ -208,7 +207,6 @@ export default function ProductsTable({
   // table state
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState("");
 
   // add product form
@@ -223,9 +221,9 @@ export default function ProductsTable({
   const [addOpen, setAddOpen] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
   const [deleting, setDeleting] = React.useState<number | null>(null);
-  const [validationErrors, setValidationErrors] = React.useState<
-    Record<string, string>
-  >({});
+  // const [validationErrors, setValidationErrors] = React.useState<
+  //   Record<string, string>
+  // >({});
 
   const [alert, setAlert] = React.useState<{
     type: "success" | "error" | null;
@@ -512,64 +510,67 @@ export default function ProductsTable({
               </Button>
             </DialogTrigger>
 
-          <DialogContent className="sm:max-w-[600px] bg-white border border-gray-200 shadow-xl">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-semibold">
-                Add Product
-              </DialogTitle>
-              <DialogDescription className="text-sm text-gray-500">
-                Create a new product. Fields marked * are required.
-              </DialogDescription>
-            </DialogHeader>
+            <DialogContent className="sm:max-w-[600px] bg-white border border-gray-200 shadow-xl">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-semibold">
+                  Add Product
+                </DialogTitle>
+                <DialogDescription className="text-sm text-gray-500">
+                  Create a new product. Fields marked * are required.
+                </DialogDescription>
+              </DialogHeader>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-              <Input
-                placeholder="Name *"
-                value={newProduct.name}
-                onChange={(e) =>
-                  setNewProduct((s) => ({ ...s, name: e.target.value }))
-                }
-              />
-              <Input
-                placeholder="Category *"
-                value={newProduct.productType}
-                onChange={(e) =>
-                  setNewProduct((s) => ({ ...s, productType: e.target.value }))
-                }
-              />
-              <Input
-                placeholder="HS Code *"
-                value={newProduct.hsCode}
-                onChange={(e) =>
-                  setNewProduct((s) => ({ ...s, hsCode: e.target.value }))
-                }
-              />
-              <Input
-                placeholder="Brand (optional)"
-                value={newProduct.brand || ""}
-                onChange={(e) =>
-                  setNewProduct((s) => ({ ...s, brand: e.target.value }))
-                }
-              />
-              <Input
-                placeholder="Model (optional)"
-                value={newProduct.model || ""}
-                onChange={(e) =>
-                  setNewProduct((s) => ({ ...s, model: e.target.value }))
-                }
-              />
-            </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+                <Input
+                  placeholder="Name *"
+                  value={newProduct.name}
+                  onChange={(e) =>
+                    setNewProduct((s) => ({ ...s, name: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Category *"
+                  value={newProduct.productType}
+                  onChange={(e) =>
+                    setNewProduct((s) => ({
+                      ...s,
+                      productType: e.target.value,
+                    }))
+                  }
+                />
+                <Input
+                  placeholder="HS Code *"
+                  value={newProduct.hsCode}
+                  onChange={(e) =>
+                    setNewProduct((s) => ({ ...s, hsCode: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Brand (optional)"
+                  value={newProduct.brand || ""}
+                  onChange={(e) =>
+                    setNewProduct((s) => ({ ...s, brand: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Model (optional)"
+                  value={newProduct.model || ""}
+                  onChange={(e) =>
+                    setNewProduct((s) => ({ ...s, model: e.target.value }))
+                  }
+                />
+              </div>
 
-            <DialogFooter className="mt-4">
-              <DialogClose asChild>
-                <Button variant="outline" disabled={saving}>
-                  Cancel
+              <DialogFooter className="mt-4">
+                <DialogClose asChild>
+                  <Button variant="outline" disabled={saving}>
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button onClick={handleCreate} disabled={saving}>
+                  {saving ? "Adding…" : "Add Product"}
                 </Button>
-              </DialogClose>
-              <Button onClick={handleCreate} disabled={saving}>
-                {saving ? "Adding…" : "Add Product"}
-              </Button>
-            </DialogFooter>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         )}

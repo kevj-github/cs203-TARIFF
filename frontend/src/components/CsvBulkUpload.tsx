@@ -1,7 +1,19 @@
 import { useState } from "react";
-import { Upload, Download, AlertCircle, CheckCircle2, FileSpreadsheet } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatNumber, formatCurrency } from "@/lib/format";
+import {
+  Upload,
+  Download,
+  AlertCircle,
+  CheckCircle2,
+  FileSpreadsheet,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { getToken } from "@/lib/auth";
 
@@ -48,7 +60,7 @@ export function CsvBulkUpload() {
       const selectedFile = e.target.files[0];
 
       // Validate file type
-      if (!selectedFile.name.endsWith('.csv')) {
+      if (!selectedFile.name.endsWith(".csv")) {
         setError("Please select a valid CSV file");
         setFile(null);
         return;
@@ -88,7 +100,9 @@ export function CsvBulkUpload() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error || `Upload failed: ${response.status}`);
+        throw new Error(
+          errorData?.error || `Upload failed: ${response.status}`
+        );
       }
 
       const data: BulkResponse = await response.json();
@@ -173,7 +187,8 @@ export function CsvBulkUpload() {
           <div className="p-3 bg-yellow-50 rounded-md border border-yellow-100 flex items-start gap-3">
             <AlertCircle className="h-4 w-4 text-yellow-700 mt-1" />
             <div className="text-sm text-yellow-900">
-              <strong>CSV Format:</strong> productId, originCountry, destCountry, quantity, customsValue
+              <strong>CSV Format:</strong> productId, originCountry,
+              destCountry, quantity, customsValue
               <br />
               <strong>Example:</strong> 1,CN,US,100,500.00
             </div>
@@ -220,7 +235,7 @@ export function CsvBulkUpload() {
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <p className="text-sm text-gray-600">Grand Total</p>
-                    <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-2xl font-bold text-blue-600">
                     {formatCurrency(results.summary.grandTotal)}
                   </p>
                 </div>
@@ -239,7 +254,7 @@ export function CsvBulkUpload() {
                     {formatCurrency(results.summary.totalTariff)}
                   </p>
                 </div>
-                  <div className="p-3 border rounded-lg">
+                <div className="p-3 border rounded-lg">
                   <p className="text-sm text-gray-600">Grand Total</p>
                   <p className="text-xl font-semibold text-blue-600">
                     {formatCurrency(results.summary.grandTotal)}
@@ -253,9 +268,7 @@ export function CsvBulkUpload() {
           <Card>
             <CardHeader>
               <CardTitle>Detailed Results</CardTitle>
-              <CardDescription>
-                Per-item calculation breakdown
-              </CardDescription>
+              <CardDescription>Per-item calculation breakdown</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -284,7 +297,9 @@ export function CsvBulkUpload() {
                         <td className="px-4 py-2">
                           {calc.success ? (
                             <>
-                              <div className="font-medium">{calc.productName}</div>
+                              <div className="font-medium">
+                                {calc.productName}
+                              </div>
                               <div className="text-xs text-gray-500">
                                 ID: {calc.productId} | HS: {calc.hsCode}
                               </div>
@@ -298,7 +313,9 @@ export function CsvBulkUpload() {
                         <td className="px-4 py-2">
                           {calc.originCountry} → {calc.destCountry}
                         </td>
-                        <td className="px-4 py-2 text-right">{calc.quantity}</td>
+                        <td className="px-4 py-2 text-right">
+                          {calc.quantity}
+                        </td>
                         <td className="px-4 py-2 text-right">
                           {calc.success
                             ? formatCurrency(calc.customsValueTotal)

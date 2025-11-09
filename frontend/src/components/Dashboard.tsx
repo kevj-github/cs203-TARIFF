@@ -6,11 +6,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
+  type PieLabelRenderProps,
 } from "recharts";
 import {
   TrendingUp,
@@ -24,25 +24,9 @@ import {
   Flag,
 } from "lucide-react";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
-import { Label } from "./ui/label";
-import { Calendar } from "./ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { CalendarIcon, FilterIcon } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { DashboardFilters } from "./DashboardFilters";
@@ -73,11 +57,11 @@ interface Country {
 }
 
 // FIXED: Added proper ApiResponse interface
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}
+// interface ApiResponse<T> {
+//   success: boolean;
+//   message: string;
+//   data: T;
+// }
 
 const countries: Country[] = [
   { id: 1, iso2: "SG", name: "Singapore" },
@@ -653,9 +637,16 @@ export default function Dashboard() {
                         outerRadius={80}
                         paddingAngle={2}
                         labelLine={true}
-                        label={({ type, count, percent }) =>
-                          `${type} (${count}, ${(percent * 100).toFixed(0)}%)`
-                        }
+                        label={(props: PieLabelRenderProps) => {
+                          const entry = productTypeData[props.index];
+                          const percent =
+                            typeof props.percent === "number"
+                              ? props.percent
+                              : 0;
+                          return `${entry.type} (${entry.count}), ${(
+                            percent * 100
+                          ).toFixed(0)}%`;
+                        }}
                       >
                         {productTypeData.map((entry, index) => (
                           <Cell
@@ -665,6 +656,7 @@ export default function Dashboard() {
                           />
                         ))}
                       </Pie>
+
                       <Tooltip
                         formatter={(value: number) => [
                           `${value} Products`,

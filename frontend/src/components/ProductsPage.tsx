@@ -1,17 +1,5 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import ProductsTable from "./ProductsTable";
 import { getUser } from "@/lib/auth";
 
@@ -26,36 +14,18 @@ interface Product {
 }
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    productType: "",
-    hsCode: "",
-  });
+  // const [newProduct, setNewProduct] = useState({
+  //   name: "",
+  //   productType: "",
+  //   hsCode: "",
+  // });
 
   // Determine admin role from stored user
   const user = getUser();
   const isAdmin = user?.role === "ADMIN";
-
-  //   useEffect(() => {
-  //     const fetchProducts = async () => {
-  //       try {
-  //         const data = await api.get<Product[]>("/products");
-  //         setProducts(data);
-  //         setError(null);
-  //       } catch (err) {
-  //         console.error("Error fetching products:", err);
-  //         setError(
-  //           err instanceof Error ? err.message : "Failed to fetch products"
-  //         );
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
-  //     fetchProducts();
-  //   }, []);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -73,25 +43,25 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  const handleAdd = async () => {
-    try {
-      await api.post("/products", newProduct);
-      await fetchProducts();
-      setNewProduct({ name: "", productType: "", hsCode: "" });
-    } catch (err) {
-      alert("Failed to add product");
-    }
-  };
+  // const handleAdd = async () => {
+  //   try {
+  //     await api.post("/products", newProduct);
+  //     await fetchProducts();
+  //     setNewProduct({ name: "", productType: "", hsCode: "" });
+  //   } catch (err) {
+  //     alert("Failed to add product");
+  //   }
+  // };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Delete this product?")) return;
-    try {
-      await api.delete(`/products/${id}`);
-      setProducts(products.filter((p) => p.id !== id));
-    } catch (err) {
-      alert("Failed to delete product");
-    }
-  };
+  // const handleDelete = async (id: number) => {
+  //   if (!confirm("Delete this product?")) return;
+  //   try {
+  //     await api.delete(`/products/${id}`);
+  //     setProducts(products.filter((p) => p.id !== id));
+  //   } catch (err) {
+  //     alert("Failed to delete product");
+  //   }
+  // };
 
   if (loading) return <p className="p-6">Loading products...</p>;
 

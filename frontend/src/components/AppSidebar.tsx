@@ -1,26 +1,23 @@
 import {
   BaggageClaim,
   Calculator,
-  Calendar,
   Home,
-  Inbox,
-  Search,
   Settings,
   User2,
-  FileSpreadsheet, 
+  FileSpreadsheet,
 } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { getUser } from "@/lib/auth";
 
 import {
-	Sidebar,
-	SidebarContent,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
 // Base menu items (common to all users)
@@ -41,15 +38,15 @@ const baseItems = [
     icon: Calculator,
   },
   {
-    title: "Bulk Upload", 
+    title: "Bulk Upload",
     url: "/bulk-upload",
     icon: FileSpreadsheet,
   },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
+  // {
+  //   title: "Search",
+  //   url: "#",
+  //   icon: Search,
+  // },
   {
     title: "Profile",
     url: "/profile",
