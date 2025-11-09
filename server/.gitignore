@@ -8,8 +8,11 @@ node_modules/
 *.log
 dist/
 .vite/
-src/main/resources/application.yml
-src/main/resources/application.properties
+# Do not ignore application resources; they must be packaged in CI builds
+# (ensure secrets are not hardcoded in these files)
+
+# Local environment file (do not commit secrets)
+.env
 
 
 ### STS ###

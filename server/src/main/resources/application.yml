@@ -5,6 +5,9 @@ spring:
   application:
     name: tariff-server
   profiles.active: ${SPRING_PROFILES_ACTIVE:prod}
+  config:
+    # Load local secrets from an optional .env file (properties format)
+    import: optional:file:.env[.properties]
 
   jpa:
     show-sql: true
@@ -18,39 +21,41 @@ server:
     include-message: always
     include-binding-errors: always
 
-# JWT Configuration
+# JWT Configuration (default)
 app:
   jwt:
-    secret: myVerySecureJWTSecretKeyThatShouldBeAtLeast64CharactersLongForHS512Algorithm
+    # Read from environment variable; provide a benign dev fallback only
+    secret: ${JWT_SECRET:dev-secret}
     expiration: 86400000  # 24 hours in milliseconds
 
 # ------------------------
 # Dev Profile (H2 In-memory for local development)
 # ------------------------
-# ---
-# spring:
-#   config:
-#     activate:
-#       on-profile: dev
-#   h2:
-#     console:
-#       enabled: true
-#   datasource:
-#     url: jdbc:h2:mem:tariffdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-#     driver-class-name: org.h2.Driver
-#     username: sa
-#     password:
-#   jpa:
-#     hibernate:
-#       ddl-auto: create-drop  # Clean slate each restart for dev
-#   flyway:
-#     enabled: false  # Disable for H2 development
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:tariffdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # Clean slate each restart for dev
+  flyway:
+    enabled: false  # Disable for H2 development
 
-# # JWT Configuration for Dev (optional override)
-# app:
-#   jwt:
-#     secret: devSecretKeyThatIsLongEnoughForHS512AlgorithmToWorkProperly123456789
-#     expiration: 86400000
+# JWT Configuration for Dev (optional override)
+app:
+  jwt:
+    # Allow overriding via env in local dev; keep short fallback
+    secret: ${JWT_SECRET:dev-secret}
+    expiration: 86400000
 
 # ------------------------
 # Prod Profile (Supabase PostgreSQL via Session Pooler)
@@ -61,9 +66,10 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require
-    username: postgres.xizwjutjdldhrthleubs
-    password: CS203Tariff1234
+    # Use Azure App Settings; no secrets in source
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10   # start small 
@@ -88,7 +94,7 @@ spring:
 # JWT Configuration for Prod
 app:
   jwt:
-    secret: ${JWT_SECRET:prodSecretKeyThatShouldBeStoredAsEnvironmentVariableInProduction}
+    secret: ${JWT_SECRET}
     expiration: 86400000  # 24 hours
 
 # ------------------------
@@ -100,9 +106,10 @@ spring:
     activate:
       on-profile: direct
   datasource:
-    url: jdbc:postgresql://db.xizwjutjdldhrthleubs.supabase.co:5432/postgres?sslmode=require
-    username: postgres
-    password: CS203Tariff1234
+    # Use Azure App Settings; no secrets in source
+    url: ${SPRING_DATASOURCE_URL_DIRECT}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10   # start small 
@@ -122,5 +129,5 @@ spring:
 # JWT Configuration for Direct
 app:
   jwt:
-    secret: ${JWT_SECRET:directSecretKeyForAlternativeConnectionMethodThatIsSecure}
+    secret: ${JWT_SECRET}
     expiration: 86400000
