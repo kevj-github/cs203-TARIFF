@@ -52,15 +52,8 @@ jobs:
       - name: Deploy to App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: anglify-tariff
+          app-name: anglify
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: server/build/libs/*.jar
-
-      - name: Verify built jar contains application.yml
-        working-directory: server
-        run: |
-          echo "Listing built artifacts:" && ls -la build/libs
-          JAR_FILE=$(ls build/libs/*.jar | head -n 1)
-          echo "Using jar: $JAR_FILE"
-          echo "Checking for application.yml inside the jar..."
-          jar tf "$JAR_FILE" | grep -E "BOOT-INF/classes/application.yml" || echo "application.yml not found"
+        env:
+          JAVA_OPTS: "-Dspring.profiles.active=prod"
