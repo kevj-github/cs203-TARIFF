@@ -77,6 +77,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/products/**", "/api/tariff-rules/**", "/api/calculate", "/api/csv/**").authenticated()
                                                 .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
                                                 .requestMatchers("/api/health").permitAll() // Health
+                                                .requestMatchers("/test-db").permitAll() // DB test endpoint
                                                                                                    // endpoints
                                                 .anyRequest().authenticated() // All other endpoints require
                                                                               // authentication
