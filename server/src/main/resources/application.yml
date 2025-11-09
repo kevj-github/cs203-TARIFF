@@ -4,7 +4,7 @@
 spring:
   application:
     name: tariff-server
-  profiles.active: prod
+  profiles.active: direct
 
   jpa:
     show-sql: true
@@ -61,10 +61,16 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require
     username: postgres.xizwjutjdldhrthleubs
     password: CS203Tariff1234
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10   # start small 
+      minimum-idle: 2
+      idle-timeout: 30000     # 30s
+      max-lifetime: 600000    # 10 min
+      connection-timeout: 20000 # 20s
   jpa:
     hibernate:
       ddl-auto: update
@@ -85,13 +91,6 @@ app:
     secret: ${JWT_SECRET:prodSecretKeyThatShouldBeStoredAsEnvironmentVariableInProduction}
     expiration: 86400000  # 24 hours
 
-    hikari:
-      maximum-pool-size: 10   # start small 
-      minimum-idle: 2
-      idle-timeout: 30000     # 30s
-      max-lifetime: 600000    # 10 min
-      connection-timeout: 20000 # 20s
-
 # ------------------------
 # Direct Profile (Alternative Supabase connection for IPv6 hosts)
 # ------------------------
@@ -101,10 +100,16 @@ spring:
     activate:
       on-profile: direct
   datasource:
-    url: jdbc:postgresql://db.xizwjutjdldhrthleubs.supabase.co:5432/postgres
+    url: jdbc:postgresql://db.xizwjutjdldhrthleubs.supabase.co:5432/postgres?sslmode=require
     username: postgres
-    password: jY8MbHb4bg_hij!
+    password: CS203Tariff1234
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10   # start small 
+      minimum-idle: 2
+      idle-timeout: 30000     # 30s
+      max-lifetime: 600000    # 10 min
+      connection-timeout: 20000 # 20s
   jpa:
     hibernate:
       ddl-auto: update
