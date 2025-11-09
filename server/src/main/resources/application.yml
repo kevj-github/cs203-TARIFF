@@ -23,7 +23,7 @@ app:
   jwt:
     # Read from environment variable; provide a benign dev fallback only
     secret: ${JWT_SECRET:dev-secret}
-    expiration: 86400000  # 24 hours in milliseconds
+    expiration: 86400000 # 24 hours in milliseconds
 
 # ------------------------
 # Dev Profile (H2 In-memory for local development)
@@ -33,28 +33,59 @@ spring:
   config:
     activate:
       on-profile: dev
-    # Only dev should import local .env for convenience
-    import: optional:file:.env[.properties]
-  h2:
-    console:
-      enabled: true
   datasource:
-    url: jdbc:h2:mem:tariffdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    # Use Azure App Settings; no secrets in source
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10 # start small
+      minimum-idle: 2
+      idle-timeout: 30000 # 30s
+      max-lifetime: 600000 # 10 min
+      connection-timeout: 20000 # 20s
   jpa:
     hibernate:
-      ddl-auto: create-drop  # Clean slate each restart for dev
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
-    enabled: false  # Disable for H2 development
+    enabled: false # Disable Flyway for now
+  mvc:
+    problemdetails:
+      enabled: true
+  messages:
+    basename: messages
 
-# JWT Configuration for Dev (optional override)
+# JWT Configuration for Prod
 app:
   jwt:
-    # Allow overriding via env in local dev; keep short fallback
-    secret: ${JWT_SECRET:dev-secret}
-    expiration: 86400000
+    secret: ${JWT_SECRET}
+    expiration: 86400000 # 24 hours
+    # Only dev should import local .env for convenience
+    # import: optional:file:.env[.properties]
+#   h2:
+#     console:
+#       enabled: true
+#   datasource:
+#     url: jdbc:h2:mem:tariffdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+#     driver-class-name: org.h2.Driver
+#     username: sa
+#     password:
+#   jpa:
+#     hibernate:
+#       ddl-auto: create-drop  # Clean slate each restart for dev
+#   flyway:
+#     enabled: false  # Disable for H2 development
+
+# # JWT Configuration for Dev (optional override)
+# app:
+#   jwt:
+#     # Allow overriding via env in local dev; keep short fallback
+#     secret: ${JWT_SECRET:dev-secret}
+#     expiration: 86400000
 
 # ------------------------
 # Prod Profile (Supabase PostgreSQL via Session Pooler)
@@ -71,10 +102,10 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10   # start small 
+      maximum-pool-size: 10 # start small
       minimum-idle: 2
-      idle-timeout: 30000     # 30s
-      max-lifetime: 600000    # 10 min
+      idle-timeout: 30000 # 30s
+      max-lifetime: 600000 # 10 min
       connection-timeout: 20000 # 20s
   jpa:
     hibernate:
@@ -83,7 +114,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
-    enabled: false  # Disable Flyway for now
+    enabled: false # Disable Flyway for now
   mvc:
     problemdetails:
       enabled: true
@@ -94,7 +125,7 @@ spring:
 app:
   jwt:
     secret: ${JWT_SECRET}
-    expiration: 86400000  # 24 hours
+    expiration: 86400000 # 24 hours
 
 # ------------------------
 # Direct Profile (Alternative Supabase connection for IPv6 hosts)
@@ -111,10 +142,10 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10   # start small 
+      maximum-pool-size: 10 # start small
       minimum-idle: 2
-      idle-timeout: 30000     # 30s
-      max-lifetime: 600000    # 10 min
+      idle-timeout: 30000 # 30s
+      max-lifetime: 600000 # 10 min
       connection-timeout: 20000 # 20s
   jpa:
     hibernate:
@@ -123,7 +154,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
-    enabled: false  # Disable Flyway for now
+    enabled: false # Disable Flyway for now
 
 # JWT Configuration for Direct
 app:
