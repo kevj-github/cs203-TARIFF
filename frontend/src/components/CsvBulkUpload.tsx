@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
-import { getToken } from "@/lib/auth";
+import { api } from "@/lib/api";
 
 interface CalculationResult {
   lineNumber: number;
@@ -85,27 +85,7 @@ export function CsvBulkUpload() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const token = getToken();
-      const headers: HeadersInit = {};
-
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const response = await fetch("http://localhost:8080/api/csv/calculate", {
-        method: "POST",
-        headers,
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(
-          errorData?.error || `Upload failed: ${response.status}`
-        );
-      }
-
-      const data: BulkResponse = await response.json();
+      const data = await api.postForm<BulkResponse>("/csv/calculate", formData);
       setResults(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");

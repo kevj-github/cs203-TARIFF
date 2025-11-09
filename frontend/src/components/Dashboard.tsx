@@ -63,14 +63,7 @@ interface Country {
 //   data: T;
 // }
 
-const countries: Country[] = [
-  { id: 1, iso2: "SG", name: "Singapore" },
-  { id: 2, iso2: "US", name: "United States" },
-  { id: 3, iso2: "DE", name: "Germany" },
-  { id: 4, iso2: "CN", name: "China" },
-  { id: 5, iso2: "GB", name: "United Kingdom" },
-  { id: 6, iso2: "ID", name: "Indonesia" },
-];
+// Countries are fetched from the backend
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -78,6 +71,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [tariffRules, setTariffRules] = useState<TariffRule[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
   const [selectedOrigin, setSelectedOrigin] = useState<string>("all");
   const [selectedDest, setSelectedDest] = useState<string>("all");
   const [selectedHS, setSelectedHS] = useState<string>("all");
@@ -271,10 +265,12 @@ export default function Dashboard() {
         if (selectedDest !== "all") url += `&dest=${selectedDest}`;
         if (selectedHS !== "all" && selectedHS) url += `&hs=${selectedHS}`;
 
+        addDebug(`Fetching countries from /api/countries`);
         addDebug(`Fetching products from /api/products`);
         addDebug(`Fetching tariff rules from ${url}`);
 
-        const [productsRes, tariffRes] = await Promise.all([
+        const [countriesRes, productsRes, tariffRes] = await Promise.all([
+          api.get("/countries"),
           api.get("/products"),
           api.get(url),
         ]);
@@ -307,6 +303,12 @@ export default function Dashboard() {
         //   );
         // }
 
+        const countryData: Country[] = unwrapArray(
+          countriesRes,
+          "Countries",
+          addDebug
+        );
+
         const productsData: Product[] = unwrapArray(
           productsRes,
           "Products",
@@ -318,6 +320,7 @@ export default function Dashboard() {
           addDebug
         );
 
+        setCountries(countryData);
         setProducts(productsData);
         setTariffRules(tariffData);
 
