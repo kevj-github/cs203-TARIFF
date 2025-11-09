@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5175", "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net", "https://anglify-tariff-d3fca9hwchb4g9fe.southeastasia-01.azurewebsites.net", "https://anglify-tariff-d3fca9hwchb4g9fe.southeastasia-01.azurewebsites.net/"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5175", "https://cs203-tariff-deploy.vercel.app", "https://cs203-tariff-deploy.vercel.app/"})
 @RequestMapping("/api/auth")
 public class AuthController {
 
