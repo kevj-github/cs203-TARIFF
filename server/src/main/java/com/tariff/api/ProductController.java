@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5175" })
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5175", "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net" })
 @RequestMapping("/api/products")
 public class ProductController {
 

@@ -49,7 +49,8 @@ public class SecurityConfig {
                 "http://localhost:5173", // Vite default dev server
                 "http://localhost:5175", // Alternate dev server (project controllers reference)
                 "http://localhost:3000", // Alternative dev port
-                "http://localhost:8080" // Backend origin (if serving static)
+                "http://localhost:8080", // Backend origin (if serving static)
+                "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));

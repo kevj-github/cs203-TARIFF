@@ -81,7 +81,7 @@ import java.util.List;
 
 @Validated
 @RestController
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5175" })
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5175", "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net" })
 @RequestMapping("/api/tariff-rules")
 public class TariffRuleController {
 
