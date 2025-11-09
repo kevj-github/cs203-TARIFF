@@ -1,7 +1,7 @@
 import { getToken, logout } from "./auth";
 import type { ApiResponse } from "./types";
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net/api";
 
 /**
  * API client that automatically includes JWT token in requests
