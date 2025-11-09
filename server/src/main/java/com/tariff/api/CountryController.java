@@ -13,7 +13,9 @@ import java.util.List;
 @CrossOrigin(origins = {
         "http://localhost:5173",
         "http://localhost:5175",
-        "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net"
+        "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net",
+        "https://anglify-tariff-d3fca9hwchb4g9fe.southeastasia-01.azurewebsites.net",
+        "https://anglify-tariff-d3fca9hwchb4g9fe.southeastasia-01.azurewebsites.net/"
 })
 @RequestMapping("/api/countries")
 public class CountryController {
