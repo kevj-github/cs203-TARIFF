@@ -29,11 +29,11 @@ interface CalculationResultProps {
   isSimulation?: boolean;
 }
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
-import { useToast } from "./ui/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 
 export function CalculationResultCard({
   baseDuty,

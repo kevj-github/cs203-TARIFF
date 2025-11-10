@@ -1,8 +1,8 @@
-import { Button } from "./ui/button";
-import { Calendar } from "./ui/calendar";
-import { Card } from "./ui/card";
-import { Label } from "./ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "../ui/button";
+import { Calendar } from "../ui/calendar";
+import { Card } from "../ui/card";
+import { Label } from "../ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Select,
   SelectContent,
@@ -11,8 +11,8 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { Skeleton } from "./ui/skeleton";
+} from "../ui/select";
+import { Skeleton } from "../ui/skeleton";
 import { CalendarIcon, FilterIcon, InfoIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";

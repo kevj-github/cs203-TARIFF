@@ -1,6 +1,6 @@
 import { LucideCroissant } from "lucide-react";
 
-import { LoginForm } from "@/components/login-form";
+import { LoginForm } from "@/components/Authorization/login-form";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function LoginPage() {

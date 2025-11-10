@@ -78,7 +78,14 @@ const FormSchema = z.object({
   dest: z.string().min(1, "Please select destination country."),
   hs: z.string().min(1, "Please select a product category."),
   customsValue: z.string().min(1, "Product value is required."),
-  quantity: z.string().min(0, "Quantity is required."),
+  quantity: z
+    .string()
+    .trim()
+    .min(1, "Quantity is required.")
+    .refine((v) => {
+      const n = Number(v);
+      return Number.isFinite(n) && n >= 1;
+    }, { message: "Minimum quantity is 1" }),
   // on: z.date().min(1, "Please select import date."),
   on: z.string().min(1, "Please select import date."),
 });
@@ -496,13 +503,16 @@ export default function CalculatorPage() {
 								<FormItem>
 									<FormLabel>Quantity</FormLabel>
 									<FormControl>
-										<Input
-											className="focus-visible:border-ring focus-visible:ring-ring/50"
-											type="number"
-											placeholder="Minimum quantity of 1"
-											value={field.value}
-											onChange={e => field.onChange(e.target.value)}
-										/>
+                                        <Input
+                                            className="focus-visible:border-ring focus-visible:ring-ring/50"
+                                            type="number"
+                                            placeholder="Minimum quantity of 1"
+                                            min={1}
+                                            step={1}
+                                            required
+                                            value={field.value}
+                                            onChange={e => field.onChange(e.target.value)}
+                                        />
 									</FormControl>
 									<FormMessage className="text-red-500" />
 								</FormItem>

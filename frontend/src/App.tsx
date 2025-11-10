@@ -1,20 +1,20 @@
 import "./App.css";
 
 import { Routes, Route, Navigate } from "react-router-dom";
-import { CsvBulkUpload } from "@/components/CsvBulkUpload";
-import LoginPage from "./components/LoginPage";
-import SignupPage from "./components/SignUp";
+import { CsvBulkUpload } from "@/components/CSVBulkUpload/CsvBulkUpload";
+import LoginPage from "./components/Authorization/LoginPage";
+import SignupPage from "./components/Authorization/SignUp";
 import TariffRuleForm from "./components/admin/TariffRuleForm";
 import AppLayout from "./AppLayout";
-import ProductsPage from "./components/ProductsPage";
-import ProfilePage from "./components/ProfilePage";
+import ProductsPage from "./components/Product/ProductsPage";
+import ProfilePage from "./components/Profile/ProfilePage";
 import "react-day-picker/style.css";
 
 import { ProtectedRoute } from "./components/protected-route";
 import { AdminRoute } from "./components/admin-route";
-import CalculatorPage from "./components/CalculatorPage";
-import HistoryPage from "./components/HistoryPage";
-import Dashboard from "./components/Dashboard";
+import CalculatorPage from "./components/Calculator/CalculatorPage";
+import HistoryPage from "./components/History/HistoryPage";
+import Dashboard from "./components/Dashboard/Dashboard";
 
 function App() {
   return (

@@ -24,9 +24,9 @@ import {
   Flag,
 } from "lucide-react";
 
-import { Card } from "./ui/card";
-import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 import { api } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { DashboardFilters } from "./DashboardFilters";
@@ -780,7 +780,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+      {/* <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-600">
@@ -796,7 +796,7 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
