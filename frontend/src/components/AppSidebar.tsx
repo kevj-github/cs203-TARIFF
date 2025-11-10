@@ -5,6 +5,8 @@ import {
   Settings,
   User2,
   FileSpreadsheet,
+  Calendar,
+  Search,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { getUser } from "@/lib/auth";
@@ -46,15 +48,12 @@ const baseItems = [
     title: "Search",
     url: "#",
     icon: Search,
+  },
+  {
     title: "Bulk Upload",
     url: "/bulk-upload",
     icon: FileSpreadsheet,
   },
-  // {
-  //   title: "Search",
-  //   url: "#",
-  //   icon: Search,
-  // },
   {
     title: "Profile",
     url: "/profile",
