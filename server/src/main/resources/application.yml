@@ -5,6 +5,8 @@ spring:
   application:
     name: tariff-server
   profiles.active: ${SPRING_PROFILES_ACTIVE:prod}
+  config:
+    import: optional:file:.env[.properties]
 
   jpa:
     show-sql: true

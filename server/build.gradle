@@ -78,7 +78,7 @@ configurations.all {
 
 tasks.named('bootRun') {
     systemProperties = [
-        'spring.profiles.active': 'dev'
+        'spring.profiles.active': 'prod'
     ]
 }
 
