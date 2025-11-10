@@ -33,7 +33,7 @@ spring:
   config:
     activate:
       on-profile: dev
-    Only dev should import local .env for convenience
+    # Only dev should import local .env for convenience
     import: optional:file:.env[.properties]
   h2:
     console:
