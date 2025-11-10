@@ -411,8 +411,7 @@ export function CalculationResultCard({
                         setIsSaveDialogOpen(false);
                         toast.toast({
                           title: "Calculation saved!",
-                          description: "Your calculation has been saved to history.",
-                          status: "success",
+                          description: "Your calculation has been saved to history."
                         });
                       } catch (error) {
                         toast.toast({
