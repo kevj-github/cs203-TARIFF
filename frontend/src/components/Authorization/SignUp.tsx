@@ -1,4 +1,4 @@
-import { LucideCroissant } from "lucide-react";
+import { Feather } from "lucide-react";
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
@@ -11,9 +11,9 @@ export default function SignupPage() {
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-              <LucideCroissant className="size-4" />
+              <Feather className="size-4" />
             </div>
-            Tariff
+            Anglify
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
@@ -24,7 +24,7 @@ export default function SignupPage() {
       </div>
 
       <DotLottieReact
-        src="https://lottie.host/7fa0255f-7fe0-43ea-a5f6-3a8619aded05/Q65blTQLbt.lottie"
+        src="https://lottie.host/a6b899ef-df12-4c45-a1e1-8247576f770b/R3U3MI3G0T.lottie"
         loop
         autoplay
         className="hidden lg:flex items-center justify-center w-full h-full mx-auto object-contain"

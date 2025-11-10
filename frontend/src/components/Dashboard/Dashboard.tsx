@@ -570,7 +570,7 @@ export default function Dashboard() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                TARIFF Dashboard
+                Anglify Dashboard
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Trade Agreements Regulating Imports and Foreign Fees

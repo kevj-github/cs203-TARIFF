@@ -34,8 +34,9 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Textarea } from "../ui/textarea";
+import { getCookie, setCookie, deleteCookie } from "@/lib/cookies";
 
 const countries = [
 	{ label: "Singapore", value: "SG" },
@@ -107,34 +108,72 @@ const FormSchema = z
 type FormData = z.infer<typeof FormSchema>;
 
 export default function TariffRuleForm() {
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState(false);
-	const [productDetails, setProductDetails] = useState<{
-		name: string;
-		productType: string;
-	} | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [productDetails, setProductDetails] = useState<{
+    name: string;
+    productType: string;
+  } | null>(null);
 
-	const form = useForm<FormData>({
-		resolver: zodResolver(FormSchema),
-		defaultValues: {
-			origin: "",
-			dest: "",
-			hs: "",
-			type: "ad_valorem",
-			rate: undefined,
-			unit: "",
-			validFrom: format(new Date(), "yyyy-MM-dd"),
-			description: "",
-		},
-	});
+  // Persist all form fields in a cookie so the page remembers inputs
+  const FORM_COOKIE_KEY = "tariff_rule_form";
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      origin: "",
+      dest: "",
+      hs: "",
+      type: "ad_valorem",
+      rate: undefined,
+      unit: "",
+      validFrom: format(new Date(), "yyyy-MM-dd"),
+      description: "",
+    },
+  });
+
+  // Hydrate form from cookie (if present)
+  useEffect(() => {
+    try {
+      const raw = getCookie(FORM_COOKIE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        form.reset({
+          origin: saved.origin ?? "",
+          dest: saved.dest ?? "",
+          hs: saved.hs ?? "",
+          type: saved.type ?? "ad_valorem",
+          rate: typeof saved.rate === "number" ? saved.rate : undefined,
+          unit: saved.unit ?? "",
+          validFrom: saved.validFrom ?? format(new Date(), "yyyy-MM-dd"),
+          validTo: saved.validTo ?? undefined,
+          description: saved.description ?? "",
+        });
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
+
+  // Watch form values and persist into cookie
+  useEffect(() => {
+    const sub = form.watch((value) => {
+      try {
+        setCookie(FORM_COOKIE_KEY, JSON.stringify(value));
+      } catch {
+        // ignore write errors
+      }
+    });
+    return () => sub.unsubscribe();
+  }, [form]);
 
 	const selectedType = form.watch("type");
 
-	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		setLoading(true);
-		setError(null);
-		setSuccess(false);
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
 
 		try {
 			await api.post("/tariff-rules", {
@@ -142,16 +181,18 @@ export default function TariffRuleForm() {
 				validTo: data.validTo || null,
 			});
 
-			setSuccess(true);
-			form.reset(); // Reset form after successful submission
-		} catch (err) {
-			setError(
-				err instanceof Error ? err.message : "Failed to create tariff rule"
-			);
-		} finally {
-			setLoading(false);
-		}
-	}
+      setSuccess(true);
+      // Reset form after successful submission and clear the cookie
+      form.reset();
+      try { deleteCookie(FORM_COOKIE_KEY); } catch { /* ignore */ }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to create tariff rule"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
 
 	return (
 		<div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
