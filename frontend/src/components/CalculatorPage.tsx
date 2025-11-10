@@ -16,141 +16,71 @@ import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-	FormField,
-	FormItem,
-	FormLabel,
-	FormControl,
-	FormMessage,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
 } from "@/components/ui/form";
 import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import { useState, useEffect, useRef } from "react";
 import { CalculationResultCard } from "./CalculationResultCard";
 import { SimulationPanel } from "./SimulationPanel";
 
 const countries = [
-	{ label: "Singapore", value: "SG" },
-	{ label: "United States", value: "US" },
-	{ label: "China", value: "CN" },
-	{ label: "Japan", value: "JP" },
-	{ label: "Germany", value: "DE" },
-	{ label: "Indonesia", value: "ID" },
+  { label: "Singapore", value: "SG" },
+  { label: "United States", value: "US" },
+  { label: "China", value: "CN" },
+  { label: "United Kingdom", value: "GB" },
+  { label: "Germany", value: "DE" },
+  { label: "Indonesia", value: "ID" },
 ];
-
-// const pcComponents = [
-//   { code: "8473.30", name: "CPU" },
-//   { code: "8473.40", name: "GPU" },
-//   { code: "8471.70", name: "Hard Disk Drives (HDD)" },
-//   { code: "8473.10", name: "Motherboards" },
-//   { code: "8504.40", name: "Power Supply Units" },
-//   { code: "8473.50", name: "RAM" },
-//   { code: "8473.10", name: "Solid State Drives (SSD)" },
-// ];
-
-// const consumerElectronics = [
-//   { code: "8528.59", name: "Computer Monitors" },
-//   { code: "8471.30", name: "Laptops/Portable computers" },
-//   { code: "8517.12", name: "Smartphones" },
-//   { code: "8528.72", name: "Televisions (LCD/LED)" },
-// ];
-
-// const powerSupport = [
-//   { code: "8471.80", name: "Computer Units - Other" },
-//   { code: "8507.60", name: "Lithium-ion Batteries" },
-//   { code: "8542.31", name: "Semiconductors/Processors" },
-// ];
 
 //3
 const pcComponents = [
-	{ id: 3, code: "8473.30", name: "CPU" },
-	{ id: 4, code: "8473.40", name: "GPU" },
-	{ id: 6, code: "8471.70", name: "Hard Disk Drives (HDD)" },
-	{ id: 11, code: "8473.30", name: "Motherboards" }, // duplicate HS, unique id
-	{ id: 10, code: "8504.40", name: "Power Supply Units" },
-	{ id: 5, code: "8473.50", name: "RAM" },
-	{ id: 7, code: "8473.30", name: "Solid State Drives (SSD)" }, // duplicate HS, unique id
+  { id: 3, code: "8473.30", name: "CPU" },
+  { id: 4, code: "8473.40", name: "GPU" },
+  { id: 6, code: "8471.70", name: "Hard Disk Drives (HDD)" },
+  { id: 11, code: "8473.30", name: "Motherboards" }, // duplicate HS, unique id
+  { id: 10, code: "8504.40", name: "Power Supply Units" },
+  { id: 5, code: "8473.50", name: "RAM" },
+  { id: 7, code: "8473.30", name: "Solid State Drives (SSD)" }, // duplicate HS, unique id
 ];
 
 const consumerElectronics = [
-	{ id: 9, code: "8528.59", name: "Computer Monitors" },
-	{ id: 2, code: "8471.30", name: "Laptops/Portable computers" },
-	{ id: 1, code: "8517.12", name: "Smartphones" },
-	{ id: 8, code: "8528.72", name: "Television Receivers - LCD/LED" },
+  { id: 9, code: "8528.59", name: "Computer Monitors" },
+  { id: 2, code: "8471.30", name: "Laptops/Portable computers" },
+  { id: 1, code: "8517.12", name: "Smartphones" },
+  { id: 8, code: "8528.72", name: "Television Receivers - LCD/LED" },
 ];
 
 const powerSupport = [
-	{ id: 14, code: "8471.80", name: "Computer Units - Other" },
-	{ id: 12, code: "8507.60", name: "Lithium-ion Batteries" },
-	{ id: 13, code: "8542.31", name: "Semiconductors/Processors" },
+  { id: 14, code: "8471.80", name: "Computer Units - Other" },
+  { id: 12, code: "8507.60", name: "Lithium-ion Batteries" },
+  { id: 13, code: "8542.31", name: "Semiconductors/Processors" },
 ];
 
-// do not delete
-
-// PC Components
-// const pcComponents = [
-//   { code: "8473.30", name: "CPU" },
-//   { code: "8473.40", name: "GPU" },
-//   { code: "8542.33", name: "Electronic Integrated Circuits - Amplifiers" },
-//   { code: "8542.32", name: "Electronic Integrated Circuits - Memories" },
-//   { code: "8471.70", name: "Hard Disk Drives (HDD)" },
-//   { code: "8504.40", name: "Power Supply Units" },
-//   { code: "8473.50", name: "RAM" },
-//   { code: "8542.31", name: "Semiconductors/Processors" },
-//   { code: "8473.10", name: "Solid State Drives (SSD)" },
-// ];
-
-// Consumer Electronics
-// const consumerElectronics = [
-//   { code: "8528.59", name: "Computer Monitors" },
-//   { code: "8471.30", name: "Laptops/Portable computers" },
-//   { code: "8517.12", name: "Smartphones" },
-//   { code: "8471.41", name: "Tablets" },
-//   { code: "8528.72", name: "Televisions (LCD/LED)" },
-//   { code: "8528.52", name: "Television Receivers - CRT" },
-//   { code: "8528.73", name: "Television Receivers - Other" },
-// ];
-
-// Power & Support
-// const powerSupport = [
-//   { code: "8471.80", name: "Computer Units - Other" },
-//   { code: "8471.41", name: "Data Processing Machines - Digital" },
-//   { code: "8471.49", name: "Data Processing Machines - Other" },
-//   { code: "8471.50", name: "Digital Processing Units" },
-//   { code: "8471.60", name: "Input/Output Units" },
-//   { code: "8507.60", name: "Lithium-ion Batteries" },
-//   { code: "8507.80", name: "Lithium Batteries - Other" },
-
-//   // { code: "8473.10", name: "Motherboards" },
-// ];
-
-// const communication = [
-//   { code: "3801.20", name: "Colloidal/Semi-colloidal Graphite" },
-//   { code: "8544.42", name: "Electric Conductors - Fitted with Connectors" },
-//   { code: "8544.49", name: "Electric Conductors - Other" },
-//   { code: "9013.80", name: "Optical Devices - Other" },
-//   { code: "8517.13", name: "Satellite Communication Equipment" },
-// ];
-
 const FormSchema = z.object({
-	origin: z.string().min(1, "Please select origin country."),
-	dest: z.string().min(1, "Please select destination country."),
-	hs: z.string().min(1, "Please select a product category."),
-	customsValue: z.string().min(1, "Product value is required."),
-	quantity: z.string().min(0, "Quantity is required."),
-	// on: z.date().min(1, "Please select import date."),
-	on: z.string().min(1, "Please select import date."),
+  origin: z.string().min(1, "Please select origin country."),
+  dest: z.string().min(1, "Please select destination country."),
+  hs: z.string().min(1, "Please select a product category."),
+  customsValue: z.string().min(1, "Product value is required."),
+  quantity: z.string().min(0, "Quantity is required."),
+  // on: z.date().min(1, "Please select import date."),
+  on: z.string().min(1, "Please select import date."),
 });
 
 export default function CalculatorPage() {
@@ -408,65 +338,60 @@ export default function CalculatorPage() {
                         }
                       </SelectValue>
                     </SelectTrigger> */}
-										<SelectTrigger className="w-[inherit]">
-											{/* Custom label: show the product name instead of HS code */}
-											{[
-												...pcComponents,
-												...consumerElectronics,
-												...powerSupport,
-											].find(
-												(item) => String(item.id) === field.value
-											)?.name || (
-												<SelectValue placeholder="Select product" />
-											)}
-										</SelectTrigger>
+                    <SelectTrigger className="w-[inherit]">
+                      {/* Custom label: show the product name instead of HS code */}
+                      {[
+                        ...pcComponents,
+                        ...consumerElectronics,
+                        ...powerSupport,
+                      ].find((item) => String(item.id) === field.value)
+                        ?.name || <SelectValue placeholder="Select product" />}
+                    </SelectTrigger>
 
-										<SelectContent className="bg-white">
-											<SelectGroup>
-												<SelectLabel>PC Components</SelectLabel>
-												{pcComponents.map((item) => (
-													<SelectItem
-														className="font-bold cursor-pointer hover:bg-indigo-100"
-														key={item.id}
-														value={String(item.id)}
-														// value={item.code}
-													>
-														{item.name}
-													</SelectItem>
-												))}
-											</SelectGroup>
+                    <SelectContent className="bg-white">
+                      <SelectGroup>
+                        <SelectLabel>PC Components</SelectLabel>
+                        {pcComponents.map((item) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={item.id}
+                            value={String(item.id)}
+                            // value={item.code}
+                          >
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
 
-											<SelectGroup>
-												<SelectLabel>
-													Consumer Electronics
-												</SelectLabel>
-												{consumerElectronics.map((item) => (
-													<SelectItem
-														className="font-bold cursor-pointer hover:bg-indigo-100"
-														key={item.id}
-														value={String(item.id)}
-														// value={item.code}
-													>
-														{item.name}
-													</SelectItem>
-												))}
-											</SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Consumer Electronics</SelectLabel>
+                        {consumerElectronics.map((item) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={item.id}
+                            value={String(item.id)}
+                            // value={item.code}
+                          >
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
 
-											<SelectGroup>
-												<SelectLabel>Power & Support</SelectLabel>
-												{powerSupport.map((item) => (
-													<SelectItem
-														className="font-bold cursor-pointer hover:bg-indigo-100"
-														key={item.id}
-														value={String(item.id)}
-														// value={item.code}
-													>
-														{item.name}
-													</SelectItem>
-												))}
-											</SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Power & Support</SelectLabel>
+                        {powerSupport.map((item) => (
+                          <SelectItem
+                            className="font-bold cursor-pointer hover:bg-indigo-100"
+                            key={item.id}
+                            value={String(item.id)}
+                            // value={item.code}
+                          >
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
 
-											{/* <SelectGroup>
+                      {/* <SelectGroup>
                         <SelectLabel>Communication</SelectLabel>
                         {communication.map((item) => (
                           <SelectItem

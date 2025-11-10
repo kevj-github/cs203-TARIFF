@@ -1,10 +1,8 @@
 import { getToken, logout } from "./auth";
 import type { ApiResponse } from "./types";
 
-// Prefer relative base in dev (proxied by Vite), allow override via env
-const API_BASE_URL =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) || 
-  "/api";
+// Point to backend API root without trailing slash
+const API_BASE_URL = "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net/api";
 
 /**
  * API client that automatically includes JWT token in requests
@@ -64,6 +62,36 @@ export const api = {
 			method: "POST",
 			headers,
 			body: JSON.stringify(data),
+			...options,
+		});
+
+		return await handleApiResponse<T>(response);
+	},
+
+	/**
+	 * Make a POST request with multipart/form-data (e.g., file uploads)
+	 * @param endpoint - API endpoint (without the base URL)
+	 * @param formData - FormData body
+	 * @param options - Additional fetch options
+	 * @returns Promise with the response data
+	 */
+	async postForm<T>(endpoint: string, formData: FormData, options = {}): Promise<T> {
+		const token = getToken();
+		const headers: HeadersInit = {
+			Accept: "application/json",
+		};
+
+		if (token) {
+			headers["Authorization"] = `Bearer ${token}`;
+		}
+
+		const url = endpoint.startsWith("http")
+			? endpoint
+			: `${API_BASE_URL}${endpoint}`;
+		const response = await fetch(url, {
+			method: "POST",
+			headers,
+			body: formData,
 			...options,
 		});
 
@@ -160,12 +188,14 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 		throw new Error(text || `HTTP ${response.status}`);
 	}
 
-	// If the server uses the ApiResponse wrapper, unwrap it
-	if (
+	// If the server uses the ApiResponse wrapper, unwrap it (must include a data field)
+	const isWrapped =
 		body &&
 		typeof body === "object" &&
-		Object.prototype.hasOwnProperty.call(body, "success")
-	) {
+		Object.prototype.hasOwnProperty.call(body, "success") &&
+		Object.prototype.hasOwnProperty.call(body, "data");
+
+	if (isWrapped) {
 		const apiResponse = body as ApiResponse<T>;
 		if (!response.ok || !apiResponse?.success) {
 			const msg =
@@ -178,7 +208,13 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 
 	// Otherwise assume the backend returned the raw data (e.g. plain list/object)
 	if (!response.ok) {
-		throw new Error(`API request failed (${response.status})`);
+		const maybeError =
+			body &&
+			typeof body === "object" &&
+			Object.prototype.hasOwnProperty.call(body, "error")
+				? (body.error as string)
+				: null;
+		throw new Error(maybeError || `API request failed (${response.status})`);
 	}
 
 	return body as T;

@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/select";
 
 interface SimulationPanelProps {
-	customTaxRate: number;
-	onTaxRateChange: (value: number) => void;
+	customTaxRate: string; // keep as string to allow empty input
+	onTaxRateChange: (value: string) => void;
 	customTaxType: string;
 	onTaxTypeChange: (value: string) => void;
 	onUseDefaults: () => void;
@@ -84,8 +84,8 @@ export function SimulationPanel({
 					<Input
 						id="tax-rate"
 						type="number"
-						value={customTaxRate || ""}
-						onChange={(e) => onTaxRateChange(Number(e.target.value))}
+						value={customTaxRate}
+						onChange={(e) => onTaxRateChange(e.target.value)}
 						placeholder={customTaxType === "SPECIFIC" ? "1000" : "10"}
 						className="focus-visible:border-ring focus-visible:ring-ring/50"
 					/>

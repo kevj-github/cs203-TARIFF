@@ -1,15 +1,12 @@
-import { GalleryVerticalEnd, LucideCroissant } from "lucide-react";
+import { LucideCroissant } from "lucide-react";
 
 import { LoginForm } from "@/components/login-form";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-
-import tariffImg from "../assets/tariff.png";
 
 export default function LoginPage() {
   return (
     <div className="grid min-h-screen w-screen lg:grid-cols-[1fr_2fr]">
       <div className="flex flex-col gap-4 p-6 md:p-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)]">
-
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
@@ -24,7 +21,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
 
       {/* <div className="bg-muted relative hidden lg:block rounded-sm"> */}
       {/* <img

@@ -2,10 +2,8 @@
 
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -14,6 +12,8 @@ import { motion } from "framer-motion";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
 import { api } from "@/lib/api";
+import { formatNumber } from "@/lib/format";
+
 interface CalculationResultProps {
   baseDuty: number;
   total: number;
@@ -180,7 +180,7 @@ export function CalculationResultCard({
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-bold text-blue-800 text-right">
-                      {baseDuty} USD
+                      ${formatNumber(baseDuty)} USD
                     </p>
                   </CardContent>
                 </Card>
@@ -203,7 +203,7 @@ export function CalculationResultCard({
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-bold text-green-800 text-right">
-                      {total} USD
+                      ${formatNumber(total)} USD
                     </p>
                   </CardContent>
                 </Card>

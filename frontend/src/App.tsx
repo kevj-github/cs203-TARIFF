@@ -1,18 +1,20 @@
 import "./App.css";
 
 import { Routes, Route, Navigate } from "react-router-dom";
-// import "./App";
+import { CsvBulkUpload } from "@/components/CsvBulkUpload";
 import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignUp";
+import TariffRuleForm from "./components/admin/TariffRuleForm";
 import AppLayout from "./AppLayout";
 import ProductsPage from "./components/ProductsPage";
 import ProfilePage from "./components/ProfilePage";
 import "react-day-picker/style.css";
 
 import { ProtectedRoute } from "./components/protected-route";
-import TariffDashboard from "./components/TariffDashboard";
+import { AdminRoute } from "./components/admin-route";
 import CalculatorPage from "./components/CalculatorPage";
 import HistoryPage from "./components/HistoryPage";
+import Dashboard from "./components/Dashboard";
 
 function App() {
   return (
@@ -23,10 +25,14 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/home" element={<TariffDashboard />} />
+          <Route path="/home" element={<Dashboard />} />
           <Route path="/product" element={<ProductsPage />} />
           <Route path="/calculator" element={<CalculatorPage />} />
           <Route path="/calculations" element={<HistoryPage />} />
+          <Route path="/bulk-upload" element={<CsvBulkUpload />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/rules" element={<TariffRuleForm />} />
+          </Route>
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>

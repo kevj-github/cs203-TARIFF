@@ -8,6 +8,12 @@ node_modules/
 *.log
 dist/
 .vite/
+# Do not ignore application resources; they must be packaged in CI builds
+# (ensure secrets are not hardcoded in these files)
+
+# Local environment file 
+.env
+
 
 ### STS ###
 .apt_generated

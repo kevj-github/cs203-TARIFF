@@ -28,6 +28,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        String uri = request.getRequestURI();
+        System.out.println("FILTER URI -> " + uri);
+
+        // Allow unauthenticated access to public resources and to the login/register
+        // endpoints only. Previously the pattern skipped all /api/auth/* paths which
+        // prevented the filter from validating the Authorization header for
+        // authenticated endpoints such as /api/auth/profile. Limit the skipping to
+        // specific endpoints.
+        if (uri.matches("(?i).*/api/(public).*") ||
+                uri.matches("(?i).*/api/auth/(login|register)$") ||
+                uri.contains("/swagger-ui") ||
+                uri.contains("/v3/api-docs") ||
+                uri.contains("/h2-console")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String jwt = getJwtFromRequest(request);
 

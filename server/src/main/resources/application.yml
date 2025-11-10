@@ -4,7 +4,7 @@
 spring:
   application:
     name: tariff-server
-  profiles.active: prod
+  profiles.active: ${SPRING_PROFILES_ACTIVE:prod}
 
   jpa:
     show-sql: true
@@ -14,12 +14,16 @@ spring:
 
 server:
   port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
 
-# JWT Configuration
+# JWT Configuration (default)
 app:
   jwt:
-    secret: myVerySecureJWTSecretKeyThatShouldBeAtLeast64CharactersLongForHS512Algorithm
-    expiration: 86400000  # 24 hours in milliseconds
+    # Read from environment variable; provide a benign dev fallback only
+    secret: ${JWT_SECRET:dev-secret}
+    expiration: 86400000 # 24 hours in milliseconds
 
 # ------------------------
 # Dev Profile (H2 In-memory for local development)
@@ -29,6 +33,8 @@ spring:
   config:
     activate:
       on-profile: dev
+    # Only dev should import local .env for convenience
+    import: optional:file:.env[.properties]
   h2:
     console:
       enabled: true
@@ -46,7 +52,8 @@ spring:
 # JWT Configuration for Dev (optional override)
 app:
   jwt:
-    secret: devSecretKeyThatIsLongEnoughForHS512AlgorithmToWorkProperly123456789
+    # Allow overriding via env in local dev; keep short fallback
+    secret: ${JWT_SECRET:dev-secret}
     expiration: 86400000
 
 # ------------------------
@@ -58,10 +65,17 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
-    username: postgres.xizwjutjdldhrthleubs
-    password: CS203Tariff1234
+    # Use Azure App Settings; no secrets in source
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10 # start small
+      minimum-idle: 2
+      idle-timeout: 30000 # 30s
+      max-lifetime: 600000 # 10 min
+      connection-timeout: 20000 # 20s
   jpa:
     hibernate:
       ddl-auto: update
@@ -69,20 +83,18 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
-    enabled: false  # Disable Flyway for now
+    enabled: false # Disable Flyway for now
+  mvc:
+    problemdetails:
+      enabled: true
+  messages:
+    basename: messages
 
 # JWT Configuration for Prod
 app:
   jwt:
-    secret: ${JWT_SECRET:prodSecretKeyThatShouldBeStoredAsEnvironmentVariableInProduction}
-    expiration: 86400000  # 24 hours
-
-    hikari:
-      maximum-pool-size: 10   # start small 
-      minimum-idle: 2
-      idle-timeout: 30000     # 30s
-      max-lifetime: 600000    # 10 min
-      connection-timeout: 20000 # 20s
+    secret: ${JWT_SECRET}
+    expiration: 86400000 # 24 hours
 
 # ------------------------
 # Direct Profile (Alternative Supabase connection for IPv6 hosts)
@@ -93,10 +105,17 @@ spring:
     activate:
       on-profile: direct
   datasource:
-    url: jdbc:postgresql://db.xizwjutjdldhrthleubs.supabase.co:5432/postgres
-    username: postgres
-    password: jY8MbHb4bg_hij!
+    # Use Azure App Settings; no secrets in source
+    url: ${SPRING_DATASOURCE_URL_DIRECT}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10 # start small
+      minimum-idle: 2
+      idle-timeout: 30000 # 30s
+      max-lifetime: 600000 # 10 min
+      connection-timeout: 20000 # 20s
   jpa:
     hibernate:
       ddl-auto: update
@@ -104,10 +123,10 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
-    enabled: false  # Disable Flyway for now
+    enabled: false # Disable Flyway for now
 
 # JWT Configuration for Direct
 app:
   jwt:
-    secret: ${JWT_SECRET:directSecretKeyForAlternativeConnectionMethodThatIsSecure}
+    secret: ${JWT_SECRET}
     expiration: 86400000

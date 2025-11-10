@@ -6,19 +6,12 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
-  ScatterChart,
-  Scatter,
 } from "recharts";
 import {
-  TrendingUp,
-  TrendingDown,
   Globe,
   Package,
   DollarSign,
@@ -26,7 +19,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Filter,
-  Search,
 } from "lucide-react";
 
 const TariffDashboard = () => {
@@ -661,7 +653,7 @@ const TariffDashboard = () => {
                   fill="#8884d8"
                   dataKey="count"
                 >
-                  {productTypeStats.map((entry, index) => (
+                  {productTypeStats.map((_, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
