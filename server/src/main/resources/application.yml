@@ -4,7 +4,7 @@
 spring:
   application:
     name: tariff-server
-  profiles.active: ${SPRING_PROFILES_ACTIVE:prod}
+  profiles.active: ${SPRING_PROFILES_ACTIVE:direct}
   config:
     import: optional:file:.env[.properties]
 
@@ -78,6 +78,12 @@ spring:
       idle-timeout: 30000 # 30s
       max-lifetime: 600000 # 10 min
       connection-timeout: 20000 # 20s
+      # PgBouncer (transaction pooling) does not support server-prepared statements.
+      # Instruct the PostgreSQL JDBC driver to avoid server-side prepares to
+      # prevent "prepared statement S_1 does not exist" errors.
+      data-source-properties:
+        prepareThreshold: 0
+        preferQueryMode: simple
   jpa:
     hibernate:
       ddl-auto: update
@@ -118,6 +124,11 @@ spring:
       idle-timeout: 30000 # 30s
       max-lifetime: 600000 # 10 min
       connection-timeout: 20000 # 20s
+      # Ensure compatibility with PgBouncer or any proxy by disabling
+      # server-prepared statements at the JDBC level.
+      data-source-properties:
+        prepareThreshold: 0
+        preferQueryMode: simple
   jpa:
     hibernate:
       ddl-auto: update
