@@ -74,7 +74,12 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/api/auth/**").permitAll() // Auth endpoints
                                                 .requestMatchers("/api/public/**").permitAll() // Public endpoints
-                                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // API
+                                                .requestMatchers(
+                                                        "/v3/api-docs",
+                                                        "/v3/api-docs/**",
+                                                        "/swagger-ui/**",
+                                                        "/swagger-ui.html"
+                                                ).permitAll() // Swagger / OpenAPI endpoints must be public
                                                 .requestMatchers("/api/products/**", "/api/tariff-rules/**", "/api/calculate", "/api/csv/**").authenticated()
                                                 .requestMatchers("/h2-console/**").permitAll() // H2 console (dev only)
                                                 .requestMatchers("/api/health").permitAll() // Health
