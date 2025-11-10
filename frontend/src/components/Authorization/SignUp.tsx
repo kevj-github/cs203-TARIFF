@@ -1,4 +1,4 @@
-import { Feather } from "lucide-react";
+// Use public anglify.svg instead of a lucide icon
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
@@ -11,7 +11,7 @@ export default function SignupPage() {
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-              <Feather className="size-4" />
+              <img src="/anglify.svg" alt="Anglify" className="h-4 w-4" />
             </div>
             Anglify
           </a>
