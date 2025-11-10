@@ -2,7 +2,7 @@ import { getToken, logout } from "./auth";
 import type { ApiResponse } from "./types";
 
 // Point to backend API root without trailing slash
-const API_BASE_URL = "anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net/api";
+const API_BASE_URL = "https://anglify-e9ejgvekgafrf5bc.southeastasia-01.azurewebsites.net/api";
 
 /**
  * API client that automatically includes JWT token in requests
