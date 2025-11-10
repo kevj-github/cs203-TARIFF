@@ -6,7 +6,6 @@ import {
   User2,
   FileSpreadsheet,
   Calendar,
-  Search,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { getUser } from "@/lib/auth";
