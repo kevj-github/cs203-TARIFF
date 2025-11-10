@@ -45,11 +45,6 @@ const baseItems = [
     icon: Calendar,
   },
   {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
     title: "Bulk Upload",
     url: "/bulk-upload",
     icon: FileSpreadsheet,

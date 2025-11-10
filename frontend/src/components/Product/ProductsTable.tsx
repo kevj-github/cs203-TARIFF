@@ -28,6 +28,7 @@ import {
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useCookieState } from "@/lib/useCookieState";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -205,9 +206,18 @@ export default function ProductsTable({
   const [error, setError] = React.useState<string | null>(null);
 
   // table state
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [sorting, setSorting] = useCookieState<SortingState>(
+    "products_sorting",
+    []
+  );
+  const [columnVisibility, setColumnVisibility] = useCookieState<Record<string, boolean>>(
+    "products_column_visibility",
+    {}
+  );
+  const [globalFilter, setGlobalFilter] = useCookieState<string>(
+    "products_global_filter",
+    ""
+  );
 
   // add product form
   const [newProduct, setNewProduct] = React.useState<NewProduct>({

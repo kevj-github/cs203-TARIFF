@@ -30,6 +30,7 @@ import { Skeleton } from "../ui/skeleton";
 import { api } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { DashboardFilters } from "./DashboardFilters";
+import { useCookieState } from "@/lib/useCookieState";
 
 interface Product {
   id: number;
@@ -72,10 +73,20 @@ export default function Dashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [tariffRules, setTariffRules] = useState<TariffRule[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [selectedOrigin, setSelectedOrigin] = useState<string>("all");
-  const [selectedDest, setSelectedDest] = useState<string>("all");
-  const [selectedHS, setSelectedHS] = useState<string>("all");
-  const [selectedDate, setSelectedDate] = useState(
+  const [selectedOrigin, setSelectedOrigin] = useCookieState<string>(
+    "dashboard_origin",
+    "all"
+  );
+  const [selectedDest, setSelectedDest] = useCookieState<string>(
+    "dashboard_dest",
+    "all"
+  );
+  const [selectedHS, setSelectedHS] = useCookieState<string>(
+    "dashboard_hs",
+    "all"
+  );
+  const [selectedDate, setSelectedDate] = useCookieState<string>(
+    "dashboard_date",
     new Date().toISOString().split("T")[0]
   );
   const [debugInfo, setDebugInfo] = useState<string[]>([]);

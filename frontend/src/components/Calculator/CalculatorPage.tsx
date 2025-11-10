@@ -39,6 +39,7 @@ import {
 import { useState, useEffect } from "react";
 import { CalculationResultCard } from "./CalculationResultCard";
 import { SimulationPanel } from "./SimulationPanel";
+import { getCookie, setCookie } from "@/lib/cookies";
 
 const countries = [
   { label: "Singapore", value: "SG" },
@@ -98,6 +99,10 @@ export default function CalculatorPage() {
 	const [customTaxType, setCustomTaxType] = useState("AD_VALOREM");
 	const [isLoadingDefaults, setIsLoadingDefaults] = useState(false);
 
+	// Persist form and UI state in cookies so navigating away and back keeps inputs
+	const FORM_COOKIE_KEY = "calculator_form";
+	const UI_COOKIE_KEY = "calculator_ui";
+
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -109,6 +114,69 @@ export default function CalculatorPage() {
 			on: "",
 		},
 	});
+
+	// On first render, hydrate the form from cookie (session)
+	useEffect(() => {
+		try {
+			const raw = getCookie(FORM_COOKIE_KEY);
+			if (raw) {
+				const saved = JSON.parse(raw);
+				// Only merge known fields
+				form.reset({
+					origin: saved.origin ?? "",
+					dest: saved.dest ?? "",
+					hs: saved.hs ?? "",
+					customsValue: saved.customsValue ?? "",
+					quantity: saved.quantity ?? "",
+					on: saved.on ?? "",
+				});
+			}
+		} catch (e) {
+			// ignore parse errors
+		}
+	}, []);
+
+	// Subscribe to form changes and persist to cookie (session)
+	useEffect(() => {
+		const sub = form.watch((value) => {
+			try {
+				setCookie(FORM_COOKIE_KEY, JSON.stringify(value));
+			} catch (e) {
+				// ignore
+			}
+		});
+		return () => sub.unsubscribe();
+	}, [form]);
+
+	// Hydrate and persist UI toggles for simulation panel
+	useEffect(() => {
+		try {
+			const raw = getCookie(UI_COOKIE_KEY);
+			if (raw) {
+				const saved = JSON.parse(raw);
+				setIsSimulationMode(Boolean(saved.isSimulationMode));
+				setCustomTaxRate(Number(saved.customTaxRate ?? 0));
+				setCustomTaxType(String(saved.customTaxType ?? "AD_VALOREM"));
+			}
+		} catch (e) {
+			// ignore
+		}
+	}, []);
+
+	useEffect(() => {
+		try {
+			setCookie(
+				UI_COOKIE_KEY,
+				JSON.stringify({
+					isSimulationMode,
+					customTaxRate,
+					customTaxType,
+				})
+			);
+		} catch (e) {
+			// ignore
+		}
+	}, [isSimulationMode, customTaxRate, customTaxType]);
 
 	// watch form fields so we can fetch default tariff rule when all are present
 	const originVal = form.watch("origin");
@@ -509,7 +577,6 @@ export default function CalculatorPage() {
                                             placeholder="Minimum quantity of 1"
                                             min={1}
                                             step={1}
-                                            required
                                             value={field.value}
                                             onChange={e => field.onChange(e.target.value)}
                                         />
