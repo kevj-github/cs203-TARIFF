@@ -11,7 +11,7 @@ dist/
 # Do not ignore application resources; they must be packaged in CI builds
 # (ensure secrets are not hardcoded in these files)
 
-# Local environment file (do not commit secrets)
+# Local environment file 
 .env
 
 

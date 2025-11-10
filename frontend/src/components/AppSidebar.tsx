@@ -38,6 +38,14 @@ const baseItems = [
     icon: Calculator,
   },
   {
+    title: "History",
+    url: "/calculations",
+    icon: Calendar,
+  },
+  {
+    title: "Search",
+    url: "#",
+    icon: Search,
     title: "Bulk Upload",
     url: "/bulk-upload",
     icon: FileSpreadsheet,

@@ -160,8 +160,8 @@ export const api = {
 };
 
 async function handleApiResponse<T>(response: Response): Promise<T> {
-	// Auto-logout on unauthorized
-	if (response.status === 401 || response.status === 403) {
+	// Auto-logout only on unauthorized (401), not on forbidden (403)
+	if (response.status === 401) {
 		try {
 			logout();
 		} catch (e) {
@@ -171,7 +171,12 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 		if (typeof window !== "undefined") {
 			window.location.href = "/login";
 		}
-		throw new Error("Unauthorized");
+		throw new Error("Unauthorized - Please log in again");
+	}
+
+	// Handle forbidden (403) without logging out
+	if (response.status === 403) {
+		throw new Error("You don't have permission to perform this action");
 	}
 
 	// Try to parse JSON; if it fails, include text in error

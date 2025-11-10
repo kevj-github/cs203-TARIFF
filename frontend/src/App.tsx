@@ -13,6 +13,7 @@ import "react-day-picker/style.css";
 import { ProtectedRoute } from "./components/protected-route";
 import { AdminRoute } from "./components/admin-route";
 import CalculatorPage from "./components/CalculatorPage";
+import HistoryPage from "./components/HistoryPage";
 import Dashboard from "./components/Dashboard";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/home" element={<Dashboard />} />
           <Route path="/product" element={<ProductsPage />} />
           <Route path="/calculator" element={<CalculatorPage />} />
+          <Route path="/calculations" element={<HistoryPage />} />
           <Route path="/bulk-upload" element={<CsvBulkUpload />} />
           <Route element={<AdminRoute />}>
             <Route path="/admin/rules" element={<TariffRuleForm />} />
