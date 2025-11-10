@@ -36,7 +36,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { CalculationResultCard } from "./CalculationResultCard";
 import { SimulationPanel } from "./SimulationPanel";
 
@@ -479,7 +479,8 @@ export default function CalculatorPage() {
 											className="focus-visible:border-ring focus-visible:ring-ring/50"
 											type="number"
 											placeholder="1000"
-											{...field}
+											value={field.value}
+											onChange={e => field.onChange(e.target.value)}
 										/>
 									</FormControl>
 									<FormMessage className="text-red-500" />
@@ -499,7 +500,8 @@ export default function CalculatorPage() {
 											className="focus-visible:border-ring focus-visible:ring-ring/50"
 											type="number"
 											placeholder="Minimum quantity of 1"
-											{...field}
+											value={field.value}
+											onChange={e => field.onChange(e.target.value)}
 										/>
 									</FormControl>
 									<FormMessage className="text-red-500" />
@@ -535,14 +537,14 @@ export default function CalculatorPage() {
 
 				{/* Simulation Panel */}
 				{isSimulationMode && (
-					<SimulationPanel
-						customTaxRate={customTaxRate}
-						onTaxRateChange={setCustomTaxRate}
-						customTaxType={customTaxType}
-						onTaxTypeChange={setCustomTaxType}
-						onUseDefaults={fetchDefaultRule}
-						isLoadingDefaults={isLoadingDefaults}
-					/>
+								<SimulationPanel
+									customTaxRate={String(customTaxRate)}
+									onTaxRateChange={val => setCustomTaxRate(Number(val))}
+									customTaxType={customTaxType}
+									onTaxTypeChange={setCustomTaxType}
+									onUseDefaults={fetchDefaultRule}
+									isLoadingDefaults={isLoadingDefaults}
+								/>
 				)}
 
 				{/* Display Result */}
@@ -552,8 +554,8 @@ export default function CalculatorPage() {
             total={result.total}
             ruleApplied={result.ruleApplied}
             error={result.error}
-            customsValue={Number(form.getValues("customsValue"))}
-            quantity={Number(form.getValues("quantity"))}
+			customsValue={Number(form.getValues("customsValue"))}
+			quantity={Number(form.getValues("quantity"))}
             indirectTax={result.indirectTax || 0}
             origin={form.getValues("origin")}
             dest={form.getValues("dest")}
