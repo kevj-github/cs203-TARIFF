@@ -14,6 +14,10 @@ import java.util.List;
 
 @Service
 public class TariffRuleService {
+    /**
+     * Service for creating and querying tariff rules.
+     * Handles DTO parsing, cross-field validation, and repository queries.
+     */
 
     private final TariffRuleRepository repo;
 
@@ -21,6 +25,9 @@ public class TariffRuleService {
         this.repo = repo;
     }
 
+    /**
+     * Create and persist a tariff rule from a validated request.
+     */
     @Transactional
     public TariffRuleResponse create(CreateTariffRuleRequest req) {
         final String origin = req.origin == null ? null : req.origin.trim().toUpperCase();
@@ -47,6 +54,10 @@ public class TariffRuleService {
         return toResp(saved);
     }
 
+    /**
+     * Find rules applicable on a given date, optionally filtering by origin, destination, and HS code.
+     * If `onDate` is null, defaults to the current date.
+     */
     @Transactional(readOnly = true)
     public List<TariffRule> findApplicable(String origin, String dest, String hs, LocalDate onDate) {
         // Default to today if null
@@ -60,16 +71,7 @@ public class TariffRuleService {
         );
     }
 
-    // @Transactional(readOnly = true)
-    // public List<TariffRule> findApplicable(String origin, String dest, String hs,
-    // LocalDate onDate) {
-    // return repo.findApplicable(
-    // origin == null ? null : origin.toUpperCase(),
-    // dest == null ? null : dest.toUpperCase(),
-    // hs,
-    // onDate
-    // );
-    // }
+    
 
     public static TariffRuleResponse toResp(TariffRule t) {
         TariffRuleResponse r = new TariffRuleResponse();

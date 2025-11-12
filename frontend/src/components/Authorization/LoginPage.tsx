@@ -1,5 +1,3 @@
-// Use public anglify.svg instead of a lucide icon
-
 import { LoginForm } from "@/components/Authorization/login-form";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
@@ -22,12 +20,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* <div className="bg-muted relative hidden lg:block rounded-sm"> */}
-      {/* <img
-          src={tariffImg}
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        /> */}
+      
 
       <DotLottieReact
         src="https://lottie.host/a6b899ef-df12-4c45-a1e1-8247576f770b/R3U3MI3G0T.lottie"
@@ -35,7 +28,7 @@ export default function LoginPage() {
         autoplay
         className="hidden lg:flex items-center justify-center w-full h-full mx-auto object-contain"
       />
-      {/* </div> */}
+      
     </div>
   );
 }

@@ -1,5 +1,3 @@
-// Use public anglify.svg instead of a lucide icon
-
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 import { SignupForm } from "./signup-form";

@@ -57,15 +57,12 @@ interface Country {
   name: string;
 }
 
-// FIXED: Added proper ApiResponse interface
-// interface ApiResponse<T> {
-//   success: boolean;
-//   message: string;
-//   data: T;
-// }
-
 // Countries are fetched from the backend
 
+/**
+ * Dashboard shows product counts, tariff rule stats, and charts.
+ * Data is loaded via `/api/products`, `/api/tariff-rules`, and `/api/countries` with optional filters.
+ */
 export default function Dashboard() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -96,122 +93,8 @@ export default function Dashboard() {
     setDebugInfo((prev) => [...prev, msg]);
   };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
-  //     setError(null);
-  //     setDebugInfo([]);
+  
 
-  //     try {
-  //       addDebug("Starting data fetch...");
-  //       const today = new Date().toISOString().split("T")[0];
-  //       addDebug(`Using date: ${today}`);
-
-  //       // Test products endpoint
-  //       // addDebug("Fetching products from /api/products");
-  //       // const productsRes = await api.get("/products");
-  //       // addDebug(
-  //       //   `Products response received: ${JSON.stringify(productsRes).substring(
-  //       //     0,
-  //       //     200
-  //       //   )}`
-  //       // );
-
-  //       // Test tariff rules endpoint
-  //       // addDebug(`Fetching tariff rules from /api/tariff-rules?on=${today}`);
-  //       // const tariffRes = await api.get(`/tariff-rules?on=${today}`);
-  //       // addDebug(
-  //       //   `Tariff response received: ${JSON.stringify(tariffRes).substring(
-  //       //     0,
-  //       //     200
-  //       //   )}`
-  //       // );
-
-  //       let url = `/tariff-rules?on=${today}`;
-  //       if (selectedOrigin !== "all") url += `&origin=${selectedOrigin}`;
-  //       if (selectedDest !== "all") url += `&dest=${selectedDest}`;
-  //       if (selectedHS && selectedHS !== "all") url += `&hs=${selectedHS}`;
-
-  //       addDebug(`Fetching tariff rules from ${url}`);
-  //       const [productsRes, tariffRes] = await Promise.all([
-  //         api.get("/products"),
-  //         api.get(url),
-  //       ]);
-
-  //       // Try different data extraction methods
-  //       let productsData: Product[] = [];
-  //       let tariffData: TariffRule[] = [];
-
-  //       // Method 1: Check if response has .data.data (ApiResponse wrapper)
-  //       if (productsRes?.data?.data) {
-  //         productsData = productsRes.data.data;
-  //         addDebug(
-  //           `✅ Products extracted via .data.data: ${productsData.length} items`
-  //         );
-  //       }
-  //       // Method 2: Check if response.data is the array directly
-  //       else if (Array.isArray(productsRes?.data)) {
-  //         productsData = productsRes.data;
-  //         addDebug(
-  //           `✅ Products extracted via .data: ${productsData.length} items`
-  //         );
-  //       }
-  //       // Method 3: Check if response is the array directly
-  //       else if (Array.isArray(productsRes)) {
-  //         productsData = productsRes;
-  //         addDebug(
-  //           `✅ Products extracted directly: ${productsData.length} items`
-  //         );
-  //       } else {
-  //         addDebug(
-  //           `❌ Could not extract products. Response type: ${typeof productsRes}`
-  //         );
-  //       }
-
-  //       // Same for tariff rules
-  //       if (tariffRes?.data?.data) {
-  //         tariffData = tariffRes.data.data;
-  //         addDebug(
-  //           `✅ Tariff rules extracted via .data.data: ${tariffData.length} items`
-  //         );
-  //       } else if (Array.isArray(tariffRes?.data)) {
-  //         tariffData = tariffRes.data;
-  //         addDebug(
-  //           `✅ Tariff rules extracted via .data: ${tariffData.length} items`
-  //         );
-  //       } else if (Array.isArray(tariffRes)) {
-  //         tariffData = tariffRes;
-  //         addDebug(
-  //           `✅ Tariff rules extracted directly: ${tariffData.length} items`
-  //         );
-  //       } else {
-  //         addDebug(
-  //           `❌ Could not extract tariff rules. Response type: ${typeof tariffRes}`
-  //         );
-  //       }
-
-  //       setProducts(productsData);
-  //       setTariffRules(tariffData);
-
-  //       addDebug(
-  //         `✅ Final state - Products: ${productsData.length}, Tariff Rules: ${tariffData.length}`
-  //       );
-  //     } catch (err: any) {
-  //       console.error("❌ Failed to load dashboard data:", err);
-  //       const errorMessage =
-  //         err.response?.data?.message || err.message || String(err);
-  //       addDebug(`❌ ERROR: ${errorMessage}`);
-  //       addDebug(`❌ Error details: ${JSON.stringify(err.response || err)}`);
-  //       setError(errorMessage);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [selectedOrigin, selectedDest, selectedHS]);
-
-  // Put this helper above useEffect
   function unwrapArray(res: any, label: string, addDebug: (s: string) => void) {
     if (!res) return [];
     const d = res.data ?? res;
@@ -286,33 +169,7 @@ export default function Dashboard() {
           api.get(url),
         ]);
 
-        // ✅ Extract product data
-        // let productsData: Product[] = [];
-        // if (productsRes?.data?.data) {
-        //   productsData = productsRes.data.data;
-        //   addDebug(
-        //     `✅ Products extracted via .data.data: ${productsData.length} items`
-        //   );
-        // } else if (Array.isArray(productsRes?.data)) {
-        //   productsData = productsRes.data;
-        //   addDebug(
-        //     `✅ Products extracted via .data: ${productsData.length} items`
-        //   );
-        // }
-
-        // ✅ Extract tariff data
-        // let tariffData: TariffRule[] = [];
-        // if (tariffRes?.data?.data) {
-        //   tariffData = tariffRes.data.data;
-        //   addDebug(
-        //     `✅ Tariff rules extracted via .data.data: ${tariffData.length} items`
-        //   );
-        // } else if (Array.isArray(tariffRes?.data)) {
-        //   tariffData = tariffRes.data;
-        //   addDebug(
-        //     `✅ Tariff rules extracted via .data: ${tariffData.length} items`
-        //   );
-        // }
+        
 
         const countryData: Country[] = unwrapArray(
           countriesRes,
@@ -684,14 +541,7 @@ export default function Dashboard() {
                         }}
                         wrapperStyle={{ outline: "none" }}
                       />
-                      {/* <Legend
-                        layout="horizontal"
-                        verticalAlign="bottom"
-                        align="center"
-                        formatter={(value) => (
-                          <span className="text-sm text-gray-600">{value}</span>
-                        )}
-                      /> */}
+                      
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -791,23 +641,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-600">
-              Data loaded from SQL database
-            </p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors">
-              Export Data
-            </button>
-            <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
-              Generate Report
-            </button>
-          </div>
-        </div>
-      </div> */}
+      
     </div>
   );
 }

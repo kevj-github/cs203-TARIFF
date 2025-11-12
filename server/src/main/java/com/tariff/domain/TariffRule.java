@@ -74,6 +74,9 @@
 //     public void setValidTo(LocalDate validTo) { this.validTo = validTo; }
 // }
 
+/**
+ * JPA entity representing a tariff rule applied to an HS code between two countries.
+ */
 package com.tariff.domain;
 
 import jakarta.persistence.*;
@@ -97,17 +100,19 @@ public class TariffRule {
     @Column(name = "hs_code", nullable = false, length = 10)
     private String hsCode;
 
-    // Enum mapped to 'ad_valorem' | 'specific' | 'compound'
+    /** Enum mapped to 'ad_valorem' | 'specific' | 'compound'. */
     @Convert(converter = RuleTypeConverter.class)
     @Column(name = "rule_type", nullable = false, length = 20)
     private RuleType type;
 
-    // NUMERIC(12,6)
+    /** Rate value stored as NUMERIC(12,6). */
     @Column(name = "rate_value", nullable = false, precision = 12, scale = 6)
     private BigDecimal rate;
 
-    // Enum mapped to 'PERCENT', 'USD_PER_UNIT', 'SGD_PER_UNIT',
-    // 'PERCENT+USD_PER_UNIT', 'PERCENT+SGD_PER_UNIT'
+    /**
+     * Enum mapped to 'PERCENT', 'USD_PER_UNIT', 'SGD_PER_UNIT',
+     * 'PERCENT+USD_PER_UNIT', 'PERCENT+SGD_PER_UNIT'.
+     */
     @Convert(converter = RateUnitConverter.class)
     @Column(name = "rate_unit", nullable = false, length = 50)
     private RateUnit unit;
